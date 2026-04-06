@@ -94,7 +94,8 @@ export const DataProvider = ({children}: {children: React.ReactNode}) => {
 
   // change theme based on isDark updates
   useEffect(() => {
-    setTheme(isDark ? light : light);
+    // TODO: create a dark theme and use it here
+    setTheme(light);
   }, [isDark]);
 
   const contextValue = {
@@ -123,4 +124,10 @@ export const DataProvider = ({children}: {children: React.ReactNode}) => {
   );
 };
 
-export const useData = () => useContext(DataContext) as IUseData;
+export const useData = () => {
+  const context = useContext(DataContext);
+  if (!context) {
+    throw new Error('useData must be used within DataProvider');
+  }
+  return context as IUseData;
+}

@@ -47,11 +47,6 @@ const Home = () => {
           <Text bold size={16} marginBottom={6}>
             Welcome 👋
           </Text>
-
-          <Text gray size={13}>
-            To manage Financial Years, open the menu 
-            and select the Financial Years option.
-          </Text>
         </Block>
 
       </Block>
@@ -60,4 +55,5 @@ const Home = () => {
 };
 
 export default Home;
+
 

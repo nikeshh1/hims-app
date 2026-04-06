@@ -4,14 +4,15 @@ import {useFonts} from 'expo-font';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
 import Menu from './Menu';
-import {useData, ThemeProvider, TranslationProvider} from '../hooks';
 
-// Keep the splash screen visible while we fetch resources
+import {DataProvider, useData, ThemeProvider, TranslationProvider} from '../hooks';
+import {VitalsProvider} from '../context/VitalsContext';
+
 SplashScreen.preventAutoHideAsync();
-export default () => {
+
+function NavigationContent() {
   const {isDark, theme, setTheme} = useData();
 
-  /* set the status bar based on isDark constant */
   useEffect(() => {
     Platform.OS === 'android' && StatusBar.setTranslucent(true);
     StatusBar.setBarStyle(isDark ? 'light-content' : 'dark-content');
@@ -20,7 +21,6 @@ export default () => {
     };
   }, [isDark]);
 
-  // load custom fonts
   const [fontsLoaded] = useFonts({
     'OpenSans-Light': theme.assets.OpenSansLight,
     'OpenSans-Regular': theme.assets.OpenSansRegular,
@@ -29,16 +29,13 @@ export default () => {
     'OpenSans-Bold': theme.assets.OpenSansBold,
   });
 
-  if (fontsLoaded) {
-    const hideSplash = async () => {
-      await SplashScreen.hideAsync();
-    };
-    hideSplash();
-  }
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  if (!fontsLoaded) return null;
 
   const navigationTheme = {
     ...DefaultTheme,
@@ -57,10 +54,20 @@ export default () => {
   return (
     <TranslationProvider>
       <ThemeProvider theme={theme} setTheme={setTheme}>
-        <NavigationContainer theme={navigationTheme}>
-          <Menu />
-        </NavigationContainer>
+        <VitalsProvider>
+          <NavigationContainer theme={navigationTheme}>
+            <Menu />
+          </NavigationContainer>
+        </VitalsProvider>
       </ThemeProvider>
     </TranslationProvider>
   );
-};
+}
+
+export default function AppNavigation() {
+  return (
+    <DataProvider>
+      <NavigationContent />
+    </DataProvider>
+  );
+}

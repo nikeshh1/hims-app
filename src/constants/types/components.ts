@@ -28,7 +28,7 @@ import {ISpacing, ITheme} from './theme';
  *
  */
 export interface IBlockProps
-  extends ISpacing,
+  extends Partial<ISpacing>,
     ViewProps,
     ScrollViewProps,
     KeyboardAvoidingViewProps {
@@ -440,7 +440,7 @@ export interface IButtonProps extends TouchableOpacityProps, ISpacing {
  * ```
  *
  */
-export interface ICheckboxProps extends ISpacing {
+export interface ICheckboxProps extends Partial<ISpacing> {
   /**
    * id for testID & accesibilityLabel
    */
@@ -652,7 +652,7 @@ export interface IModalProps extends ModalProps {
  * ```
  *
  */
-export interface ISwitchProps extends ISpacing {
+export interface ISwitchProps extends Partial<ISpacing> {
   /**
    * id for testID & accesibilityLabel
    */
@@ -711,7 +711,7 @@ export interface ISwitchProps extends ISpacing {
  * ```
  *
  */
-export interface ITextProps extends TextProps, ISpacing {
+export interface ITextProps extends TextProps, Partial<ISpacing> {
   /**
    * id for testID & accesibilityLabel
    */

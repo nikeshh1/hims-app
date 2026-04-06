@@ -85,7 +85,7 @@ const DrawerContent = (
   // screen list for Drawer menu
   const screens = [
     {name: t('screens.home'), to: 'Home', icon: assets.home},
-    {name: 'Financial Years', to: 'FinancialYears', icon: assets.document},
+    {name: 'Patient Monitoring', to: 'VitalsList', icon: assets.document, section: 'Nurse'},
     {name: t('screens.components'), to: 'Components', icon: assets.components},
     {name: t('screens.articles'), to: 'Articles', icon: assets.document},
     {name: t('screens.rental'), to: 'Pro', icon: assets.rental},
@@ -124,34 +124,45 @@ const DrawerContent = (
 
         {screens?.map((screen, index) => {
           const isActive = active === screen.to;
+          const showSection = screen.section && (index === 0 || screens[index - 1]?.section !== screen.section);
           return (
-            <Button
-              row
-              justify="flex-start"
-              marginBottom={sizes.s}
-              key={`menu-screen-${screen.name}-${index}`}
-              onPress={() => handleNavigation(screen.to)}>
-              <Block
-                flex={0}
-                radius={6}
-                align="center"
-                justify="center"
-                width={sizes.md}
-                height={sizes.md}
-                marginRight={sizes.s}
-                gradient={gradients[isActive ? 'primary' : 'white']}>
-                <Image
-                  radius={0}
-                  width={14}
-                  height={14}
-                  source={screen.icon}
-                  color={colors[isActive ? 'white' : 'black']}
-                />
-              </Block>
-              <Text p semibold={isActive} color={labelColor}>
-                {screen.name}
-              </Text>
-            </Button>
+            <React.Fragment key={`menu-screen-${screen.name}-${index}`}>
+              {showSection && (
+                <Text
+                  semibold
+                  transform="uppercase"
+                  opacity={0.5}
+                  style={{marginTop: index > 0 ? 10 : 0, marginBottom: 6}}>
+                  {screen.section}
+                </Text>
+              )}
+              <Button
+                row
+                justify="flex-start"
+                marginBottom={sizes.s}
+                onPress={() => handleNavigation(screen.to)}>
+                <Block
+                  flex={0}
+                  radius={6}
+                  align="center"
+                  justify="center"
+                  width={sizes.md}
+                  height={sizes.md}
+                  marginRight={sizes.s}
+                  gradient={gradients[isActive ? 'primary' : 'white']}>
+                  <Image
+                    radius={0}
+                    width={14}
+                    height={14}
+                    source={screen.icon}
+                    color={colors[isActive ? 'white' : 'black']}
+                  />
+                </Block>
+                <Text p semibold={isActive} color={labelColor}>
+                  {screen.name}
+                </Text>
+              </Button>
+            </React.Fragment>
           );
         })}
 

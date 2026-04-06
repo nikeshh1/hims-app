@@ -9,22 +9,24 @@ import {
 
 // Spacing types
 export interface ISpacing
-  extends Pick<
-    FlexStyle,
-    | 'margin'
-    | 'marginVertical'
-    | 'marginHorizontal'
-    | 'marginLeft'
-    | 'marginRight'
-    | 'marginTop'
-    | 'marginBottom'
-    | 'padding'
-    | 'paddingVertical'
-    | 'paddingHorizontal'
-    | 'paddingLeft'
-    | 'paddingRight'
-    | 'paddingTop'
-    | 'paddingBottom'
+  extends Partial<
+    Pick<
+      FlexStyle,
+      | 'margin'
+      | 'marginVertical'
+      | 'marginHorizontal'
+      | 'marginLeft'
+      | 'marginRight'
+      | 'marginTop'
+      | 'marginBottom'
+      | 'padding'
+      | 'paddingVertical'
+      | 'paddingHorizontal'
+      | 'paddingLeft'
+      | 'paddingRight'
+      | 'paddingTop'
+      | 'paddingBottom'
+    >
   > {}
 
 export type TWeight =

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import {
   Articles,
@@ -9,17 +9,18 @@ import {
   Profile,
   Register,
   Pro,
-  FinancialYears,
-  AddFinancialYear,
-  FYHospitalMapping,
+  VitalsList,
+  AddVital,
+  ViewVital,
+  TrashVitals,
 } from '../screens';
 
-import {useScreenOptions, useTranslation} from '../hooks';
+import { useScreenOptions, useTranslation } from '../hooks';
 
 const Stack = createStackNavigator();
 
 export default () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const screenOptions = useScreenOptions();
 
   return (
@@ -28,28 +29,28 @@ export default () => {
       <Stack.Screen
         name="Home"
         component={Home}
-        options={{title: t('navigation.home')}}
+        options={{ title: t('navigation.home') }}
       />
-
-      {/* FINANCIAL YEARS LIST */}
+      {/* NURSE – PATIENT MONITORING */}
       <Stack.Screen
-        name="FinancialYears"
-        component={FinancialYears}
-        options={{title: 'Financial Years'}}
+        name="VitalsList"
+        component={VitalsList}
+        options={{ title: 'Patient Monitoring' }}
       />
-
-      {/* ADD FY */}
       <Stack.Screen
-        name="AddFinancialYear"
-        component={AddFinancialYear}
-        options={{title: 'Add Financial Year'}}
+        name="AddVital"
+        component={AddVital}
+        options={{ title: 'Record Vital' }}
       />
-
-      {/* MAPPING SCREEN */}
       <Stack.Screen
-        name="FYHospitalMapping"
-        component={FYHospitalMapping}
-        options={{title: 'Hospital Mapping'}}
+        name="ViewVital"
+        component={ViewVital}
+        options={{ title: 'Vital Details' }}
+      />
+      <Stack.Screen
+        name="TrashVitals"
+        component={TrashVitals}
+        options={{ title: 'Deleted Vitals' }}
       />
 
       {/* OTHER SCREENS */}
@@ -62,7 +63,7 @@ export default () => {
       <Stack.Screen
         name="Articles"
         component={Articles}
-        options={{title: t('navigation.articles')}}
+        options={{ title: t('navigation.articles') }}
       />
 
       <Stack.Screen name="Pro" component={Pro} options={screenOptions.pro} />
@@ -70,13 +71,13 @@ export default () => {
       <Stack.Screen
         name="Profile"
         component={Profile}
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
       />
 
       <Stack.Screen
         name="Register"
         component={Register}
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
