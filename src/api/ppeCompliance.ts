@@ -54,3 +54,18 @@ export const getPpeComplianceReport = async (startDate?: string, endDate?: strin
   const res = await apiClient.get(`/ppe-compliance/report?${params.toString()}`);
   return res.data.data;
 };
+
+export const getDeletedPpeLogs = async () => {
+  const res = await apiClient.get("/ppe-compliance/deleted");
+  return res.data.data;
+};
+
+export const restorePpeLog = async (id: string) => {
+  const res = await apiClient.post(`/ppe-compliance/${id}/restore`);
+  return res.data.data;
+};
+
+export const forceDeletePpeLog = async (id: string) => {
+  const res = await apiClient.delete(`/ppe-compliance/${id}/force-delete`);
+  return res.data;
+};

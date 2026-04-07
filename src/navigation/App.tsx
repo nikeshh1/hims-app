@@ -7,6 +7,8 @@ import Menu from './Menu';
 
 import {DataProvider, useData, ThemeProvider, TranslationProvider} from '../hooks';
 import {VitalsProvider} from '../context/VitalsContext';
+import {MedicationProvider} from '../context/MedicationAdministrationContext';
+import {PpeProvider} from '../context/PpeComplianceContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -55,9 +57,13 @@ function NavigationContent() {
     <TranslationProvider>
       <ThemeProvider theme={theme} setTheme={setTheme}>
         <VitalsProvider>
-          <NavigationContainer theme={navigationTheme}>
-            <Menu />
-          </NavigationContainer>
+          <MedicationProvider>
+            <PpeProvider>
+              <NavigationContainer theme={navigationTheme}>
+                <Menu />
+              </NavigationContainer>
+            </PpeProvider>
+          </MedicationProvider>
         </VitalsProvider>
       </ThemeProvider>
     </TranslationProvider>

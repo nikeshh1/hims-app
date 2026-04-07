@@ -3,251 +3,321 @@ import {
   ScrollView,
   View,
   StyleSheet,
-  RefreshControl,
-  FlatList,
-  TextInput,
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  FlatList,
 } from 'react-native';
-import { Text, Modal, Button } from '../components';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Text } from '../components';
 import { useTheme } from '../hooks';
-import { useMedicationAdministration } from '../context/MedicationAdministrationContext';
 import { sizes, colors } from '../constants';
+import apiClient from '../api/apiClient';
 
-const MedicationAdministrationList = ({ navigation }: any) => {
+const MedicationAdministrationList = ({ navigation, route }: any) => {
   const theme = useTheme();
-  const {
-    medications,
-    loading,
-    error,
-    refreshMedications,
-    getMedicationsByStatus,
-    removeMedication,
-  } = useMedicationAdministration();
+  const [patients, setPatients] = useState<any[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<any>(null);
+  const [medications, setMedications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showPatientDropdown, setShowPatientDropdown] = useState(false);
+  const [nurseId, setNurseId] = useState<string | null>(route?.params?.nurseId || null);
 
-  const [refreshing, setRefreshing] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await refreshMedications();
-    setRefreshing(false);
-  };
-
+  // Load nurse ID and patients on mount
   useEffect(() => {
-    if (selectedStatus !== 'all') {
-      getMedicationsByStatus(selectedStatus);
-    } else {
-      refreshMedications();
+    if (!nurseId) {
+      getNurseId();
     }
-  }, [selectedStatus]);
+    loadPatients();
+  }, []);
 
-  const filteredMedications = medications.filter((med) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      (med.patient?.name?.toLowerCase().includes(query) || '') ||
-      (med.prescription_item_id?.toLowerCase().includes(query) || '')
-    );
-  });
-
-  const handleDelete = (id: string) => {
-    Alert.alert(
-      'Delete Medication Record',
-      'Are you sure you want to delete this record?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await removeMedication(id);
-              Alert.alert('Success', 'Medication record deleted successfully');
-            } catch (err) {
-              Alert.alert('Error', 'Failed to delete medication record');
-            }
-          },
-        },
-      ]
-    );
+  const getNurseId = async () => {
+    try {
+      // Try multiple keys that might store the nurse ID
+      let id = await AsyncStorage.getItem('userId');
+      if (!id) id = await AsyncStorage.getItem('nurse_id');
+      if (!id) id = await AsyncStorage.getItem('user_id');
+      if (!id) id = await AsyncStorage.getItem('currentUserId');
+      
+      if (id) {
+        setNurseId(id);
+      } else {
+        // Fallback: use default nurse ID (1 is usually the first user/nurse)
+        console.warn('No nurse ID found in storage, using default ID: 1');
+        setNurseId('1');
+      }
+    } catch (err) {
+      console.log('Error retrieving nurse ID:', err);
+      setNurseId('1'); // Fallback to default user ID
+    }
   };
 
-  const renderMedicationCard = ({ item }: any) => {
+  const loadPatients = async () => {
+    try {
+      setLoading(true);
+      const res = await apiClient.get('/medication-administration/patients-list');
+      setPatients(res.data.data || []);
+    } catch (err) {
+      Alert.alert('Error', 'Failed to load patients');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMedications = async (patientId: string) => {
+    try {
+      setLoading(true);
+      const res = await apiClient.get(`/medication-administration/prescriptions/${patientId}`);
+      setMedications(res.data.data || []);
+      setLoading(false);
+    } catch (err) {
+      Alert.alert('Error', 'Failed to load medications');
+      setLoading(false);
+    }
+  };
+
+  const handlePatientSelect = (patient: any) => {
+    setSelectedPatient(patient);
+    setShowPatientDropdown(false);
+    loadMedications(patient.id);
+  };
+
+  const handleStatusUpdate = async (prescriptionItemId: string, status: 'administered' | 'missed') => {
+    try {
+      if (!nurseId) {
+        Alert.alert('Error', 'Nurse ID not found. Please login again.');
+        return;
+      }
+
+      // Format timestamp for Laravel (YYYY-MM-DD HH:MM:SS)
+      const now = new Date();
+      const isoString = now.toISOString();
+      const administeredTime = isoString.slice(0, 19).replace('T', ' '); // Convert to "YYYY-MM-DD HH:MM:SS"
+
+      // Create or update medication administration record
+      await apiClient.post('/medication-administration', {
+        patient_id: selectedPatient.id,
+        prescription_item_id: prescriptionItemId,
+        status: status,
+        nurse_id: nurseId,
+        administered_time: administeredTime,
+      });
+
+      Alert.alert('Success', `Medication marked as ${status}`);
+      loadMedications(selectedPatient.id);
+    } catch (err) {
+      Alert.alert('Error', `Failed to mark medication as ${status}`);
+    }
+  };
+
+  const renderMedicationRow = ({ item, index }: any) => {
     const statusColor: string = ({
-      administered: colors.success,
-      pending: colors.warning,
-      skipped: colors.gray,
-      refused: colors.danger,
+      pending: '#f59e0b',
+      administered: '#10b981',
+      missed: '#ef4444',
+      skipped: '#9ca3af',
+      refused: '#ef4444',
     } as any)[item.status] || colors.primary;
 
     return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate('ViewMedication', { id: item.id })}
-        style={[styles.card, { backgroundColor: theme.colors.background }]}
-      >
-        <View style={styles.cardHeader}>
-          <View style={styles.cardTitle}>
-            <Text bold>{item.patient?.name || 'Unknown Patient'}</Text>
-            <Text color={theme.colors.gray} size={12}>
-              {new Date(item.administered_time).toLocaleString()}
-            </Text>
-          </View>
-          <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
-            <Text white size={12} bold>
-              {item.status.toUpperCase()}
+      <View style={[styles.tableRow, index % 2 === 0 && styles.tableRowAlt]}>
+        <View style={styles.medicineCell}>
+          <Text bold numberOfLines={1}>{item.medicine_name || 'N/A'}</Text>
+        </View>
+        <View style={styles.tableCell}>
+          <Text numberOfLines={1}>{item.dosage || 'N/A'}</Text>
+        </View>
+        <View style={styles.tableCell}>
+          <Text numberOfLines={1}>{item.frequency || 'N/A'}</Text>
+        </View>
+        <View style={styles.tableCell}>
+          <Text numberOfLines={1}>{item.duration || 'N/A'}</Text>
+        </View>
+        <View style={styles.tableCell}>
+          <Text numberOfLines={2}>{item.instructions || 'N/A'}</Text>
+        </View>
+        <View style={styles.statusContainer}>
+          <View 
+            style={[
+              styles.statusBadge,
+              { backgroundColor: statusColor }
+            ]}
+          >
+            <Text white size={10} bold>
+              {(item.status || 'pending').toUpperCase()}
             </Text>
           </View>
         </View>
-
-        <View style={styles.cardDetails}>
-          <View style={styles.detailRow}>
-            <Text color={theme.colors.gray} size={12}>
-              Nurse:
-            </Text>
-            <Text size={12}>{item.nurse?.name || 'N/A'}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text color={theme.colors.gray} size={12}>
-              Prescription:
-            </Text>
-            <Text size={12}>{item.prescription_item_id}</Text>
-          </View>
-          {item.notes && (
-            <View style={styles.detailRow}>
-              <Text color={theme.colors.gray} size={12}>
-                Notes:
+        <View style={styles.timeCell}>
+          {item.administered_time ? (
+            <>
+              <Text size={10} numberOfLines={1}>
+                {new Date(item.administered_time).toLocaleDateString()}
               </Text>
-              <Text size={12}>{item.notes}</Text>
-            </View>
+              <Text size={10} numberOfLines={1}>
+                {new Date(item.administered_time).toLocaleTimeString()}
+              </Text>
+            </>
+          ) : (
+            <Text size={10}>-</Text>
           )}
         </View>
-
-        <View style={styles.cardActions}>
+        <View style={styles.actionCell}>
           <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => navigation.navigate('EditMedication', { id: item.id })}
+            style={[
+              styles.actionButton,
+              {
+                backgroundColor: item.status === 'administered' || item.status === 'missed' 
+                  ? '#d1d5db' 
+                  : '#10b981',
+                opacity: item.status === 'administered' || item.status === 'missed' 
+                  ? 0.65 
+                  : 1,
+              }
+            ]}
+            onPress={() => {
+              if (item.status !== 'administered' && item.status !== 'missed') {
+                handleStatusUpdate(item.prescription_item_id, 'administered');
+              }
+            }}
+            disabled={item.status === 'administered' || item.status === 'missed'}
           >
-            <Text primary size={12}>
-              Edit
+            <Text white size={9} bold>
+              ✓ ADMINISTER
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => handleDelete(item.id)}
+            style={[
+              styles.actionButton,
+              {
+                backgroundColor: item.status === 'administered' || item.status === 'missed' 
+                  ? '#d1d5db' 
+                  : '#ef4444',
+                opacity: item.status === 'administered' || item.status === 'missed' 
+                  ? 0.65 
+                  : 1,
+              }
+            ]}
+            onPress={() => {
+              if (item.status !== 'administered' && item.status !== 'missed') {
+                handleStatusUpdate(item.prescription_item_id, 'missed');
+              }
+            }}
+            disabled={item.status === 'administered' || item.status === 'missed'}
           >
-            <Text danger size={12}>
-              Delete
+            <Text white size={9} bold>
+              ✕ MISSED
             </Text>
           </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.header}>
-        <Text h3 bold>
-          Medication Administration
+        <Text h3 bold style={{ color: colors.primary }}>
+          💊 Medication Administration
         </Text>
-        <Text color={theme.colors.gray} size={12}>
-          Track medication administration to patients
+        <Text size={12} color={theme.colors.gray} style={{ marginTop: sizes.base * 0.5 }}>
+          Manage patient medications
         </Text>
       </View>
 
-      {/* Add Button */}
-      <TouchableOpacity
-        style={[styles.addButton, { backgroundColor: colors.primary }]}
-        onPress={() => navigation.navigate('AddMedication')}
-      >
-        <Text white bold>
-          + Add Medication
+      {/* Patient Selector */}
+      <View style={styles.patientSelector}>
+        <Text bold size={13} style={{ marginBottom: sizes.base * 0.75, color: '#333' }}>
+          👤 Select Patient
         </Text>
-      </TouchableOpacity>
-
-      {/* Search Bar */}
-      <TextInput
-        style={[
-          styles.searchInput,
-          { borderColor: theme.colors.light, color: theme.colors.text },
-        ]}
-        placeholder="Search by patient or prescription..."
-        placeholderTextColor={theme.colors.gray}
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
-
-      {/* Status Filter */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.filterContainer}
-      >
-        {['all', 'pending', 'administered', 'skipped', 'refused'].map((status) => (
-          <TouchableOpacity
-            key={status}
-            style={[
-              styles.filterButton,
-              selectedStatus === status && styles.filterButtonActive,
-              {
-                borderColor: selectedStatus === status ? colors.primary : theme.colors.light,
-                backgroundColor:
-                  selectedStatus === status ? (colors.primary as any) + '20' : 'transparent',
-              },
-            ]}
-            onPress={() => setSelectedStatus(status)}
-          >
-            <Text
-              bold
-              size={12}
-              style={{
-                color: selectedStatus === status ? colors.primary : theme.colors.gray,
-              }}
-            >
-              {status.charAt(0).toUpperCase() + status.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      {/* Loading State */}
-      {loading && (
-        <View style={styles.centerContent}>
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      )}
-
-      {/* Error State */}
-      {error && (
-        <View style={[styles.errorContainer, { backgroundColor: (colors.danger as any) + '20' }]}>
-          <Text danger bold>
-            Error: {error}
+        <TouchableOpacity
+          style={[
+            styles.dropdown,
+            { borderColor: colors.primary }
+          ]}
+          onPress={() => setShowPatientDropdown(!showPatientDropdown)}
+        >
+          <Text bold color={selectedPatient?.name ? '#333' : theme.colors.gray}>
+            {selectedPatient?.name || 'Choose a patient...'}
           </Text>
-          <TouchableOpacity onPress={handleRefresh} style={styles.retryButton}>
-            <Text primary>Retry</Text>
-          </TouchableOpacity>
+        </TouchableOpacity>
+
+        {showPatientDropdown && (
+          <View style={[styles.dropdownList, { backgroundColor: theme.colors.card }]}>
+            <ScrollView nestedScrollEnabled style={{ maxHeight: 200 }}>
+              {patients.map((patient) => (
+                <TouchableOpacity
+                  key={patient.id}
+                  style={styles.dropdownItem}
+                  onPress={() => handlePatientSelect(patient)}
+                >
+                  <Text>{patient.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+      </View>
+
+      {/* Medications Table */}
+      {selectedPatient && (
+        <View style={styles.tableContainer}>
+          {loading ? (
+            <View style={styles.centerContent}>
+              <ActivityIndicator size="large" color={colors.primary} />
+            </View>
+          ) : medications.length > 0 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={true} nestedScrollEnabled={true}>
+              <View>
+                {/* Table Header */}
+                <View style={[styles.tableRow, styles.tableHeader]}>
+                  <View style={styles.medicineCell}>
+                    <Text style={styles.headerText} bold>MEDICINE</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={styles.headerText} bold>DOSAGE</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={styles.headerText} bold>FREQUENCY</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={styles.headerText} bold>DURATION</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={styles.headerText} bold>INSTRUCTIONS</Text>
+                  </View>
+                  <View style={styles.statusContainer}>
+                    <Text style={styles.headerText} bold>STATUS</Text>
+                  </View>
+                  <View style={styles.timeCell}>
+                    <Text style={styles.headerText} bold>TIME</Text>
+                  </View>
+                  <View style={styles.actionCell}>
+                    <Text style={styles.headerText} bold>ACTIONS</Text>
+                  </View>
+                </View>
+
+                {/* Table Rows */}
+                <FlatList
+                  data={medications}
+                  renderItem={renderMedicationRow}
+                  keyExtractor={(item) => item.prescription_item_id}
+                  scrollEnabled={false}
+                />
+              </View>
+            </ScrollView>
+          ) : (
+            <View style={styles.centerContent}>
+              <Text color={theme.colors.gray}>No medications found for this patient</Text>
+            </View>
+          )}
         </View>
       )}
 
-      {/* Medications List */}
-      {!loading && (
-        <FlatList
-          data={filteredMedications}
-          renderItem={renderMedicationCard}
-          keyExtractor={(item) => item.id}
-          scrollEnabled={false}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text color={theme.colors.gray}>No medications found</Text>
-            </View>
-          }
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-          }
-          contentContainerStyle={styles.listContent}
-        />
+      {!selectedPatient && !loading && (
+        <View style={styles.centerContent}>
+          <Text color={theme.colors.gray}>Select a patient to view medications</Text>
+        </View>
       )}
     </View>
   );
@@ -256,101 +326,153 @@ const MedicationAdministrationList = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: sizes.padding,
+    padding: sizes.padding,
   },
   header: {
-    marginVertical: sizes.padding,
+    marginBottom: sizes.padding * 1.2,
+    paddingBottom: sizes.base * 1.2,
+    paddingHorizontal: sizes.base * 0.5,
+    borderBottomWidth: 2,
+    borderBottomColor: 'rgba(59, 130, 246, 0.2)',
   },
-  addButton: {
-    paddingVertical: sizes.padding * 0.75,
-    paddingHorizontal: sizes.padding,
-    borderRadius: sizes.buttonRadius,
-    alignItems: 'center',
+  patientSelector: {
     marginBottom: sizes.padding,
-  },
-  searchInput: {
+    paddingHorizontal: sizes.base,
+    paddingVertical: sizes.base * 1.2,
+    borderRadius: sizes.radius,
+    backgroundColor: '#f0f7ff',
     borderWidth: 1,
-    borderRadius: sizes.buttonRadius,
-    paddingHorizontal: sizes.padding * 0.75,
-    paddingVertical: sizes.padding * 0.5,
-    marginBottom: sizes.padding,
-    fontSize: 14,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  filterContainer: {
-    marginBottom: sizes.padding,
-  },
-  filterButton: {
-    borderWidth: 1,
-    borderRadius: sizes.buttonRadius,
-    paddingHorizontal: sizes.padding * 0.75,
-    paddingVertical: sizes.padding * 0.5,
-    marginRight: sizes.padding * 0.5,
-  },
-  filterButtonActive: {
+  dropdown: {
     borderWidth: 2,
+    borderRadius: sizes.radius,
+    paddingHorizontal: sizes.base,
+    paddingVertical: sizes.base * 0.85,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
+    elevation: 2,
   },
-  card: {
-    borderRadius: sizes.buttonRadius,
-    padding: sizes.padding,
-    marginBottom: sizes.padding,
+  dropdownList: {
+    marginTop: sizes.base * 0.75,
+    borderRadius: sizes.radius,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: 'rgba(59, 130, 246, 0.4)',
+    paddingVertical: 0,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
   },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: sizes.padding * 0.75,
+  dropdownItem: {
+    paddingHorizontal: sizes.base,
+    paddingVertical: sizes.base * 0.9,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
   },
-  cardTitle: {
+  tableContainer: {
     flex: 1,
+    marginTop: sizes.base * 1.2,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    borderRadius: sizes.radius,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    backgroundColor: '#fff',
   },
-  statusBadge: {
-    paddingHorizontal: sizes.padding * 0.75,
-    paddingVertical: sizes.padding * 0.5,
-    borderRadius: sizes.buttonRadius,
-    marginLeft: sizes.padding,
-  },
-  cardDetails: {
-    marginBottom: sizes.padding * 0.75,
-  },
-  detailRow: {
+  tableRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: sizes.padding * 0.5,
+    paddingVertical: sizes.base * 0.9,
+    paddingHorizontal: sizes.base * 0.5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+    alignItems: 'center',
+    backgroundColor: '#fff',
   },
-  cardActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: sizes.padding,
+  tableRowAlt: {
+    backgroundColor: '#f9fafb',
+  },
+  tableHeader: {
+    backgroundColor: '#f0f7ff',
+    borderBottomWidth: 2,
+    borderBottomColor: 'rgba(59, 130, 246, 0.4)',
+  },
+  headerText: {
+    fontSize: 11,
+    color: colors.primary,
+    letterSpacing: 0.5,
+  },
+  medicineCell: {
+    width: 120,
+    paddingHorizontal: sizes.base * 0.75,
+    paddingRight: sizes.base,
+  },
+  tableCell: {
+    width: 100,
+    paddingHorizontal: sizes.base * 0.5,
+    fontSize: 12,
+  },
+  statusContainer: {
+    width: 90,
+    paddingHorizontal: sizes.base * 0.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  timeCell: {
+    width: 110,
+    paddingHorizontal: sizes.base * 0.5,
+    fontSize: 11,
+  },
+  actionCell: {
+    width: 140,
+    paddingHorizontal: sizes.base * 0.5,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    gap: sizes.base * 0.35,
   },
   actionButton: {
-    paddingHorizontal: sizes.padding * 0.75,
-    paddingVertical: sizes.padding * 0.5,
+    paddingHorizontal: sizes.base * 0.6,
+    paddingVertical: sizes.base * 0.5,
+    borderRadius: sizes.radius * 0.75,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  statusBadge: {
+    paddingHorizontal: sizes.base * 0.85,
+    paddingVertical: sizes.base * 0.45,
+    borderRadius: sizes.radius * 0.75,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    elevation: 1,
   },
   centerContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  errorContainer: {
-    padding: sizes.padding,
-    borderRadius: sizes.buttonRadius,
-    marginBottom: sizes.padding,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  retryButton: {
-    paddingHorizontal: sizes.padding * 0.75,
-    paddingVertical: sizes.padding * 0.5,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: sizes.padding * 2,
-  },
-  listContent: {
-    paddingBottom: sizes.padding,
   },
 });
 

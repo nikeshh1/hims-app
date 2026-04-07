@@ -138,7 +138,7 @@ const ViewMedicationAdministration = ({ navigation, route }: any) => {
       <View style={styles.actionContainer}>
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: colors.primary }]}
-          onPress={() => navigation.navigate('EditMedication', { id: medication.id })}
+          onPress={() => navigation.navigate('AddMedicationAdministration', { id: medication.id })}
         >
           <Text white bold>
             Edit Record

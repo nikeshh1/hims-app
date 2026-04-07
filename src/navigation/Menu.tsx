@@ -86,6 +86,10 @@ const DrawerContent = (
   const screens = [
     {name: t('screens.home'), to: 'Home', icon: assets.home},
     {name: 'Patient Monitoring', to: 'VitalsList', icon: assets.document, section: 'Nurse'},
+    {name: 'Medication Administration', to: 'MedicationAdministrationList', icon: assets.document},
+    {name: 'Infection Logs', to: 'InfectionLogsList', icon: assets.document},
+    {name: 'Isolation Tracking', to: 'IsolationTrackingList', icon: assets.document},
+    {name: 'PPE Compliance', to: 'PpeComplianceList', icon: assets.document},
     {name: t('screens.components'), to: 'Components', icon: assets.components},
     {name: t('screens.articles'), to: 'Articles', icon: assets.document},
     {name: t('screens.rental'), to: 'Pro', icon: assets.rental},

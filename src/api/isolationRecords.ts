@@ -44,3 +44,18 @@ export const getActiveIsolationRecords = async () => {
   const res = await apiClient.get("/isolation-records/status/active");
   return res.data.data;
 };
+
+export const getDeletedIsolationRecords = async () => {
+  const res = await apiClient.get("/isolation-records/deleted");
+  return res.data.data;
+};
+
+export const restoreIsolationRecord = async (id: string) => {
+  const res = await apiClient.post(`/isolation-records/${id}/restore`);
+  return res.data.data;
+};
+
+export const forceDeleteIsolationRecord = async (id: string) => {
+  const res = await apiClient.delete(`/isolation-records/${id}/force-delete`);
+  return res.data;
+};

@@ -28,17 +28,30 @@ export { default as TrashVitals } from './TrashVitals';
 export { default as MedicationAdministrationList } from './MedicationAdministrationList';
 export { default as AddMedicationAdministration } from './AddMedicationAdministration';
 export { default as ViewMedicationAdministration } from './ViewMedicationAdministration';
+export { default as TrashMedicationAdministration } from './MedicationAdministration/TrashMedicationAdministration';
 export { default as EditMedicationAdministration } from './AddMedicationAdministration'; // Reuse form
 
+// Infection Logs
+export {
+  InfectionLogsList,
+  AddInfectionLog,
+  ViewInfectionLog,
+  TrashInfectionLogs,
+} from './InfectionLogs';
+
 // Isolation Tracking
-export { default as IsolationTrackingList } from './IsolationTrackingList';
-export { default as AddIsolationRecord } from './AddIsolationRecord';
-export { default as ViewIsolationRecord } from './ViewIsolationRecord';
-export { default as EditIsolationRecord } from './AddIsolationRecord'; // Reuse form
+export {
+  IsolationTrackingList,
+  AddIsolationTracking,
+  ViewIsolationTracking,
+  TrashIsolationTracking,
+} from './IsolationTracking';
 
 // PPE Compliance
-export { default as PpeComplianceList } from './PpeComplianceList';
-export { default as AddPpeComplianceLog } from './AddPpeComplianceLog';
-export { default as ViewPpeComplianceLog } from './ViewPpeComplianceLog';
-export { default as EditPpeComplianceLog } from './AddPpeComplianceLog'; // Reuse form
+export {
+  PpeComplianceList,
+  AddPpeCompliance,
+  ViewPpeCompliance,
+  TrashPpeCompliance,
+} from './PpeCompliance';
 

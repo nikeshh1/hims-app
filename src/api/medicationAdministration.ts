@@ -44,3 +44,18 @@ export const getMedicationAdministrationByStatus = async (status: string) => {
   const res = await apiClient.get(`/medication-administration/status/${status}`);
   return res.data.data;
 };
+
+export const getDeletedMedicationAdministrations = async () => {
+  const res = await apiClient.get("/medication-administration/deleted");
+  return res.data.data;
+};
+
+export const restoreMedicationAdministration = async (id: string) => {
+  const res = await apiClient.post(`/medication-administration/${id}/restore`);
+  return res.data.data;
+};
+
+export const forceDeleteMedicationAdministration = async (id: string) => {
+  const res = await apiClient.delete(`/medication-administration/${id}/force-delete`);
+  return res.data;
+};

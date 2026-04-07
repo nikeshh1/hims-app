@@ -13,6 +13,22 @@ import {
   AddVital,
   ViewVital,
   TrashVitals,
+  MedicationAdministrationList,
+  AddMedicationAdministration,
+  ViewMedicationAdministration,
+  TrashMedicationAdministration,
+  InfectionLogsList,
+  AddInfectionLog,
+  ViewInfectionLog,
+  TrashInfectionLogs,
+  IsolationTrackingList,
+  AddIsolationTracking,
+  ViewIsolationTracking,
+  TrashIsolationTracking,
+  PpeComplianceList,
+  AddPpeCompliance,
+  ViewPpeCompliance,
+  TrashPpeCompliance,
 } from '../screens';
 
 import { useScreenOptions, useTranslation } from '../hooks';
@@ -51,6 +67,94 @@ export default () => {
         name="TrashVitals"
         component={TrashVitals}
         options={{ title: 'Deleted Vitals' }}
+      />
+
+      {/* MEDICATION ADMINISTRATION */}
+      <Stack.Screen
+        name="MedicationAdministrationList"
+        component={MedicationAdministrationList}
+        options={{ title: 'Medication Administration' }}
+      />
+      <Stack.Screen
+        name="AddMedicationAdministration"
+        component={AddMedicationAdministration}
+        options={{ title: 'Add Medication' }}
+      />
+      <Stack.Screen
+        name="ViewMedicationAdministration"
+        component={ViewMedicationAdministration}
+        options={{ title: 'Medication Details' }}
+      />
+      <Stack.Screen
+        name="TrashMedicationAdministration"
+        component={TrashMedicationAdministration}
+        options={{ title: 'Deleted Medications' }}
+      />
+
+      {/* INFECTION LOGS */}
+      <Stack.Screen
+        name="InfectionLogsList"
+        component={InfectionLogsList}
+        options={{ title: 'Infection Logs' }}
+      />
+      <Stack.Screen
+        name="AddInfectionLog"
+        component={AddInfectionLog}
+        options={{ title: 'Add Infection Log' }}
+      />
+      <Stack.Screen
+        name="ViewInfectionLog"
+        component={ViewInfectionLog}
+        options={{ title: 'Infection Details' }}
+      />
+      <Stack.Screen
+        name="TrashInfectionLogs"
+        component={TrashInfectionLogs}
+        options={{ title: 'Deleted Logs' }}
+      />
+
+      {/* ISOLATION TRACKING */}
+      <Stack.Screen
+        name="IsolationTrackingList"
+        component={IsolationTrackingList}
+        options={{ title: 'Isolation Tracking' }}
+      />
+      <Stack.Screen
+        name="AddIsolationTracking"
+        component={AddIsolationTracking}
+        options={{ title: 'Add Isolation Record' }}
+      />
+      <Stack.Screen
+        name="ViewIsolationTracking"
+        component={ViewIsolationTracking}
+        options={{ title: 'Isolation Details' }}
+      />
+      <Stack.Screen
+        name="TrashIsolationTracking"
+        component={TrashIsolationTracking}
+        options={{ title: 'Deleted Records' }}
+      />
+
+      {/* PPE COMPLIANCE */}
+      <Stack.Screen
+        name="PpeComplianceList"
+        component={PpeComplianceList}
+        options={{ title: 'PPE Compliance' }}
+      />
+      <Stack.Screen
+        name="AddPpeCompliance"
+        component={AddPpeCompliance}
+        options={{ title: 'Add PPE Record' }}
+      />
+      <Stack.Screen
+        name="ViewPpeCompliance"
+        component={ViewPpeCompliance}
+        options={{ title: 'PPE Details' }}
+      />
+      <Stack.Screen
+        name="TrashPpeCompliance"
+        component={TrashPpeCompliance}
+        options={{ title: 'Deleted Records' }}
       />
 
       {/* OTHER SCREENS */}
