@@ -29,6 +29,10 @@ import {
   AddPpeCompliance,
   ViewPpeCompliance,
   TrashPpeCompliance,
+  NurseShiftsList,
+  AddHandover,
+  ViewHandover,
+  TrashShifts,
 } from '../screens';
 
 import { useScreenOptions, useTranslation } from '../hooks';
@@ -155,6 +159,28 @@ export default () => {
         name="TrashPpeCompliance"
         component={TrashPpeCompliance}
         options={{ title: 'Deleted Records' }}
+      />
+
+      {/* NURSE SHIFTS */}
+      <Stack.Screen
+        name="NurseShiftsList"
+        component={NurseShiftsList}
+        options={{ title: 'Shift Assignments' }}
+      />
+      <Stack.Screen
+        name="AddHandover"
+        component={AddHandover}
+        options={{ title: 'Add Handover Notes' }}
+      />
+      <Stack.Screen
+        name="ViewHandover"
+        component={ViewHandover}
+        options={{ title: 'View Handover Notes' }}
+      />
+      <Stack.Screen
+        name="TrashShifts"
+        component={TrashShifts}
+        options={{ title: 'Deleted Shifts' }}
       />
 
       {/* OTHER SCREENS */}

@@ -90,6 +90,7 @@ const DrawerContent = (
     {name: 'Infection Logs', to: 'InfectionLogsList', icon: assets.document},
     {name: 'Isolation Tracking', to: 'IsolationTrackingList', icon: assets.document},
     {name: 'PPE Compliance', to: 'PpeComplianceList', icon: assets.document},
+    {name: 'Shift Assignments', to: 'NurseShiftsList', icon: assets.document},
     {name: t('screens.components'), to: 'Components', icon: assets.components},
     {name: t('screens.articles'), to: 'Articles', icon: assets.document},
     {name: t('screens.rental'), to: 'Pro', icon: assets.rental},

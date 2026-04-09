@@ -55,3 +55,11 @@ export {
   TrashPpeCompliance,
 } from './PpeCompliance';
 
+// Nurse Shifts
+export {
+  NurseShiftsList,
+  AddHandover,
+  ViewHandover,
+  TrashShifts,
+} from './NurseShifts';
+
