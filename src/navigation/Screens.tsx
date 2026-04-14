@@ -33,6 +33,9 @@ import {
   AddHandover,
   ViewHandover,
   TrashShifts,
+  DischargePreparationList,
+  AddDischargePreparation,
+  ConfirmDischarge,
 } from '../screens';
 
 import { useScreenOptions, useTranslation } from '../hooks';
@@ -181,6 +184,23 @@ export default () => {
         name="TrashShifts"
         component={TrashShifts}
         options={{ title: 'Deleted Shifts' }}
+      />
+
+      {/* DISCHARGE PREPARATION */}
+      <Stack.Screen
+        name="DischargePreparationList"
+        component={DischargePreparationList}
+        options={{ title: 'Discharge Preparation' }}
+      />
+      <Stack.Screen
+        name="AddDischargePreparation"
+        component={AddDischargePreparation}
+        options={{ title: 'Discharge Checklist' }}
+      />
+      <Stack.Screen
+        name="ConfirmDischarge"
+        component={ConfirmDischarge}
+        options={{ title: 'Confirm Discharge' }}
       />
 
       {/* OTHER SCREENS */}

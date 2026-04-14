@@ -63,3 +63,10 @@ export {
   TrashShifts,
 } from './NurseShifts';
 
+// Discharge Preparation
+export {
+  DischargePreparationList,
+  AddDischargePreparation,
+  ConfirmDischarge,
+} from './DischargePreparation';
+
