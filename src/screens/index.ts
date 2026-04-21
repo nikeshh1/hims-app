@@ -70,3 +70,7 @@ export {
   ConfirmDischarge,
 } from './DischargePreparation';
 
+// Lab & Report View
+export { default as LabReportsList } from './LabReportsList';
+export { default as ViewLabReport } from './ViewLabReport';
+

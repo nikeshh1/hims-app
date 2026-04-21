@@ -36,6 +36,8 @@ import {
   DischargePreparationList,
   AddDischargePreparation,
   ConfirmDischarge,
+  LabReportsList,
+  ViewLabReport,
 } from '../screens';
 
 import { useScreenOptions, useTranslation } from '../hooks';
@@ -201,6 +203,18 @@ export default () => {
         name="ConfirmDischarge"
         component={ConfirmDischarge}
         options={{ title: 'Confirm Discharge' }}
+      />
+
+      {/* LAB & REPORT VIEW */}
+      <Stack.Screen
+        name="LabReportsList"
+        component={LabReportsList}
+        options={{ title: 'Lab & Report View' }}
+      />
+      <Stack.Screen
+        name="ViewLabReport"
+        component={ViewLabReport}
+        options={{ title: 'Report Details' }}
       />
 
       {/* OTHER SCREENS */}
