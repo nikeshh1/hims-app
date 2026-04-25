@@ -76,6 +76,8 @@ const DrawerContent = (
       setActive(to);
       // Properly navigate to screens in the stack
       navigation.navigate('Screens', { screen: to });
+      // Close the drawer after navigation
+      navigation.closeDrawer();
     },
     [navigation, setActive],
   );
@@ -93,6 +95,10 @@ const DrawerContent = (
     {name: 'Shift Assignments', to: 'NurseShiftsList', icon: assets.document},
     {name: 'Discharge Preparation', to: 'DischargePreparationList', icon: assets.document},
     {name: 'Lab & Report View', to: 'LabReportsList', icon: assets.document},
+    {name: 'Vital Trends Report', to: 'VitalsTrendsReport', icon: assets.document, section: 'Reports'},
+    {name: 'Medication Report', to: 'MedicationReport', icon: assets.document},
+    {name: 'Shift Report', to: 'ShiftReport', icon: assets.document},
+    {name: 'Patient Summary', to: 'PatientSummary', icon: assets.document},
     {name: t('screens.components'), to: 'Components', icon: assets.components},
     {name: t('screens.articles'), to: 'Articles', icon: assets.document},
     {name: t('screens.rental'), to: 'Pro', icon: assets.rental},

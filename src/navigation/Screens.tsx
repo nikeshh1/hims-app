@@ -38,6 +38,10 @@ import {
   ConfirmDischarge,
   LabReportsList,
   ViewLabReport,
+  VitalsTrendsReport,
+  MedicationReport,
+  ShiftReport,
+  PatientSummary,
 } from '../screens';
 
 import { useScreenOptions, useTranslation } from '../hooks';
@@ -215,6 +219,28 @@ export default () => {
         name="ViewLabReport"
         component={ViewLabReport}
         options={{ title: 'Report Details' }}
+      />
+
+      {/* NURSE REPORTS */}
+      <Stack.Screen
+        name="VitalsTrendsReport"
+        component={VitalsTrendsReport}
+        options={{ title: 'Vital Trends Report' }}
+      />
+      <Stack.Screen
+        name="MedicationReport"
+        component={MedicationReport}
+        options={{ title: 'Medication Report' }}
+      />
+      <Stack.Screen
+        name="ShiftReport"
+        component={ShiftReport}
+        options={{ title: 'Shift Report' }}
+      />
+      <Stack.Screen
+        name="PatientSummary"
+        component={PatientSummary}
+        options={{ title: 'Patient Summary' }}
       />
 
       {/* OTHER SCREENS */}

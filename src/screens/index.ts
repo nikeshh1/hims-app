@@ -74,3 +74,11 @@ export {
 export { default as LabReportsList } from './LabReportsList';
 export { default as ViewLabReport } from './ViewLabReport';
 
+// Nurse Reports
+export {
+  VitalsTrendsReport,
+  MedicationReport,
+  ShiftReport,
+  PatientSummary,
+} from './Reports';
+
