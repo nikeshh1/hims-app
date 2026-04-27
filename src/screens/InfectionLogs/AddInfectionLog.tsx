@@ -11,7 +11,8 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../hooks';
 import { Block, Text, Input, Button } from '../../components';
 import { colors } from '../../constants';
-import apiClient from '../../api/apiClient';
+import { getPatients } from '../../api/vitals';
+import { getPatientDisplayName } from '../../utils/patientDisplay';
 import {
   createInfectionLog,
   updateInfectionLog,
@@ -44,7 +45,7 @@ const AddInfectionLog = () => {
 
   const loadPatients = async () => {
     try {
-      const res = await apiClient.get('/medication-administration/patients-list');
+      const res = await getPatients();
       setPatients(res.data.data || []);
     } catch (err: any) {
       console.log('Failed to load patients');
@@ -129,7 +130,7 @@ const AddInfectionLog = () => {
           onPress={() => setShowPatientDropdown(!showPatientDropdown)}
         >
           <Text bold color={selectedPatient ? '#333' : '#999'}>
-            {selectedPatient?.name || 'Choose a patient...'}
+            {selectedPatient ? getPatientDisplayName(selectedPatient) : 'Choose a patient...'}
           </Text>
         </TouchableOpacity>
         {showPatientDropdown && (
@@ -141,7 +142,7 @@ const AddInfectionLog = () => {
                   style={styles.dropdownItem}
                   onPress={() => handlePatientSelect(patient)}
                 >
-                  <Text>{patient.name}</Text>
+                  <Text>{getPatientDisplayName(patient)}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>

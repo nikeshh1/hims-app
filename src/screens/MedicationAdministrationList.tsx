@@ -13,6 +13,8 @@ import { Text } from '../components';
 import { useTheme } from '../hooks';
 import { sizes, colors } from '../constants';
 import apiClient from '../api/apiClient';
+import { getPatients } from '../api/vitals';
+import { getPatientDisplayName } from '../utils/patientDisplay';
 
 const MedicationAdministrationList = ({ navigation, route }: any) => {
   const theme = useTheme();
@@ -55,7 +57,7 @@ const MedicationAdministrationList = ({ navigation, route }: any) => {
   const loadPatients = async () => {
     try {
       setLoading(true);
-      const res = await apiClient.get('/medication-administration/patients-list');
+      const res = await getPatients();
       setPatients(res.data.data || []);
     } catch (err) {
       Alert.alert('Error', 'Failed to load patients');
@@ -111,30 +113,33 @@ const MedicationAdministrationList = ({ navigation, route }: any) => {
   };
 
   const renderMedicationRow = ({ item, index }: any) => {
+    const status = item.status || 'pending';
     const statusColor: string = ({
       pending: '#f59e0b',
       administered: '#10b981',
       missed: '#ef4444',
       skipped: '#9ca3af',
       refused: '#ef4444',
-    } as any)[item.status] || colors.primary;
+    } as any)[status] || colors.primary;
 
     return (
       <View style={[styles.tableRow, index % 2 === 0 && styles.tableRowAlt]}>
         <View style={styles.medicineCell}>
-          <Text bold numberOfLines={1}>{item.medicine_name || 'N/A'}</Text>
+          <Text bold numberOfLines={1}>
+            {item.medicine_name || item.medication_name || item.prescription_item?.medicine_name || 'N/A'}
+          </Text>
         </View>
         <View style={styles.tableCell}>
-          <Text numberOfLines={1}>{item.dosage || 'N/A'}</Text>
+          <Text numberOfLines={1}>{item.dosage || item.prescription_item?.dosage || 'N/A'}</Text>
         </View>
         <View style={styles.tableCell}>
-          <Text numberOfLines={1}>{item.frequency || 'N/A'}</Text>
+          <Text numberOfLines={1}>{item.frequency || item.prescription_item?.frequency || 'N/A'}</Text>
         </View>
         <View style={styles.tableCell}>
-          <Text numberOfLines={1}>{item.duration || 'N/A'}</Text>
+          <Text numberOfLines={1}>{item.duration || item.prescription_item?.duration || 'N/A'}</Text>
         </View>
         <View style={styles.tableCell}>
-          <Text numberOfLines={2}>{item.instructions || 'N/A'}</Text>
+          <Text numberOfLines={2}>{item.instructions || item.prescription_item?.instructions || 'N/A'}</Text>
         </View>
         <View style={styles.statusContainer}>
           <View 
@@ -144,7 +149,7 @@ const MedicationAdministrationList = ({ navigation, route }: any) => {
             ]}
           >
             <Text white size={10} bold>
-              {(item.status || 'pending').toUpperCase()}
+              {status.toUpperCase()}
             </Text>
           </View>
         </View>
@@ -167,20 +172,20 @@ const MedicationAdministrationList = ({ navigation, route }: any) => {
             style={[
               styles.actionButton,
               {
-                backgroundColor: item.status === 'administered' || item.status === 'missed' 
+                backgroundColor: status === 'administered' || status === 'missed' 
                   ? '#d1d5db' 
                   : '#10b981',
-                opacity: item.status === 'administered' || item.status === 'missed' 
+                opacity: status === 'administered' || status === 'missed' 
                   ? 0.65 
                   : 1,
               }
             ]}
             onPress={() => {
-              if (item.status !== 'administered' && item.status !== 'missed') {
+              if (status !== 'administered' && status !== 'missed') {
                 handleStatusUpdate(item.prescription_item_id, 'administered');
               }
             }}
-            disabled={item.status === 'administered' || item.status === 'missed'}
+            disabled={status === 'administered' || status === 'missed'}
           >
             <Text white size={9} bold>
               ✓ ADMINISTER
@@ -190,20 +195,20 @@ const MedicationAdministrationList = ({ navigation, route }: any) => {
             style={[
               styles.actionButton,
               {
-                backgroundColor: item.status === 'administered' || item.status === 'missed' 
+                backgroundColor: status === 'administered' || status === 'missed' 
                   ? '#d1d5db' 
                   : '#ef4444',
-                opacity: item.status === 'administered' || item.status === 'missed' 
+                opacity: status === 'administered' || status === 'missed' 
                   ? 0.65 
                   : 1,
               }
             ]}
             onPress={() => {
-              if (item.status !== 'administered' && item.status !== 'missed') {
+              if (status !== 'administered' && status !== 'missed') {
                 handleStatusUpdate(item.prescription_item_id, 'missed');
               }
             }}
-            disabled={item.status === 'administered' || item.status === 'missed'}
+            disabled={status === 'administered' || status === 'missed'}
           >
             <Text white size={9} bold>
               ✕ MISSED
@@ -237,8 +242,8 @@ const MedicationAdministrationList = ({ navigation, route }: any) => {
           ]}
           onPress={() => setShowPatientDropdown(!showPatientDropdown)}
         >
-          <Text bold color={selectedPatient?.name ? '#333' : theme.colors.gray}>
-            {selectedPatient?.name || 'Choose a patient...'}
+          <Text bold color={selectedPatient ? '#333' : theme.colors.gray}>
+            {selectedPatient ? getPatientDisplayName(selectedPatient) : 'Choose a patient...'}
           </Text>
         </TouchableOpacity>
 
@@ -251,7 +256,7 @@ const MedicationAdministrationList = ({ navigation, route }: any) => {
                   style={styles.dropdownItem}
                   onPress={() => handlePatientSelect(patient)}
                 >
-                  <Text>{patient.name}</Text>
+                  <Text>{getPatientDisplayName(patient)}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -301,7 +306,7 @@ const MedicationAdministrationList = ({ navigation, route }: any) => {
                 <FlatList
                   data={medications}
                   renderItem={renderMedicationRow}
-                  keyExtractor={(item) => item.prescription_item_id}
+                  keyExtractor={(item) => String(item.id || item.prescription_item_id)}
                   scrollEnabled={false}
                 />
               </View>

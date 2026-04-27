@@ -11,7 +11,8 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../hooks';
 import { Block, Text, Input, Button } from '../../components';
 import { colors } from '../../constants';
-import apiClient from '../../api/apiClient';
+import { getPatients } from '../../api/vitals';
+import { getPatientDisplayName } from '../../utils/patientDisplay';
 import {
   createPpeLog,
   updatePpeLog,
@@ -58,7 +59,7 @@ const AddPpeCompliance = () => {
 
   const loadPatients = async () => {
     try {
-      const res = await apiClient.get('/medication-administration/patients-list');
+      const res = await getPatients();
       setPatients(res.data.data || []);
     } catch (err: any) {
       console.log('Failed to load patients');
@@ -174,7 +175,7 @@ const AddPpeCompliance = () => {
           }}
         >
           <Text size={14} style={{ flex: 1 }}>
-            {selectedPatient ? `${selectedPatient.first_name} ${selectedPatient.last_name}` : 'Select Patient'}
+            {selectedPatient ? getPatientDisplayName(selectedPatient) : 'Select Patient'}
           </Text>
           <Text>▼</Text>
         </TouchableOpacity>
@@ -189,7 +190,7 @@ const AddPpeCompliance = () => {
                   onPress={() => handlePatientSelect(item)}
                 >
                   <Text color={selectedPatient?.id === item.id ? colors.primary : '#000'}>
-                    {item.first_name} {item.last_name}
+                    {getPatientDisplayName(item)}
                   </Text>
                 </TouchableOpacity>
               ))}
