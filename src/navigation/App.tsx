@@ -13,6 +13,7 @@ import {NurseShiftsProvider} from '../context/NurseShiftsContext';
 import {DischargeProvider} from '../context/DischargePreparationContext';
 import {LabReportsProvider} from '../context/LabReportsContext';
 import {NurseReportsProvider} from '../context/NurseReportsContext';
+import {DashboardProvider} from '../context/DashboardContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -67,9 +68,11 @@ function NavigationContent() {
                 <DischargeProvider>
                   <LabReportsProvider>
                     <NurseReportsProvider>
-                      <NavigationContainer theme={navigationTheme}>
-                        <Menu />
-                      </NavigationContainer>
+                      <DashboardProvider>
+                        <NavigationContainer theme={navigationTheme}>
+                          <Menu />
+                        </NavigationContainer>
+                      </DashboardProvider>
                     </NurseReportsProvider>
                   </LabReportsProvider>
                 </DischargeProvider>

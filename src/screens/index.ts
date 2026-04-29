@@ -74,6 +74,9 @@ export {
 export { default as LabReportsList } from './LabReportsList';
 export { default as ViewLabReport } from './ViewLabReport';
 
+// Dashboard
+export { NurseDashboard, CriticalPatients } from './Dashboard';
+
 // Nurse Reports
 export {
   VitalsTrendsReport,

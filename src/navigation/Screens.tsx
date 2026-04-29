@@ -42,6 +42,8 @@ import {
   MedicationReport,
   ShiftReport,
   PatientSummary,
+  NurseDashboard,
+  CriticalPatients,
 } from '../screens';
 
 import { useScreenOptions, useTranslation } from '../hooks';
@@ -219,6 +221,18 @@ export default () => {
         name="ViewLabReport"
         component={ViewLabReport}
         options={{ title: 'Report Details' }}
+      />
+
+      {/* NURSE DASHBOARD */}
+      <Stack.Screen
+        name="NurseDashboard"
+        component={NurseDashboard}
+        options={{ title: 'Dashboard' }}
+      />
+      <Stack.Screen
+        name="CriticalPatients"
+        component={CriticalPatients}
+        options={{ title: 'Critical Patients' }}
       />
 
       {/* NURSE REPORTS */}
