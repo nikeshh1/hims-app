@@ -15,6 +15,9 @@ import {LabReportsProvider} from '../context/LabReportsContext';
 import {NurseReportsProvider} from '../context/NurseReportsContext';
 import {DashboardProvider} from '../context/DashboardContext';
 
+import {VendorProvider} from '../context/VendorContext';
+import {ControlledDrugProvider} from '../context/ControlledDrugContext';
+
 SplashScreen.preventAutoHideAsync();
 
 function NavigationContent() {
@@ -61,25 +64,29 @@ function NavigationContent() {
   return (
     <TranslationProvider>
       <ThemeProvider theme={theme} setTheme={setTheme}>
-        <VitalsProvider>
-          <MedicationProvider>
-            <PpeProvider>
-              <NurseShiftsProvider>
-                <DischargeProvider>
-                  <LabReportsProvider>
-                    <NurseReportsProvider>
-                      <DashboardProvider>
-                        <NavigationContainer theme={navigationTheme}>
-                          <Menu />
-                        </NavigationContainer>
-                      </DashboardProvider>
-                    </NurseReportsProvider>
-                  </LabReportsProvider>
-                </DischargeProvider>
-              </NurseShiftsProvider>
-            </PpeProvider>
-          </MedicationProvider>
-        </VitalsProvider>
+        <VendorProvider>
+          <ControlledDrugProvider>
+            <VitalsProvider>
+              <MedicationProvider>
+                <PpeProvider>
+                  <NurseShiftsProvider>
+                    <DischargeProvider>
+                      <LabReportsProvider>
+                        <NurseReportsProvider>
+                          <DashboardProvider>
+                            <NavigationContainer theme={navigationTheme}>
+                              <Menu />
+                            </NavigationContainer>
+                          </DashboardProvider>
+                        </NurseReportsProvider>
+                      </LabReportsProvider>
+                    </DischargeProvider>
+                  </NurseShiftsProvider>
+                </PpeProvider>
+              </MedicationProvider>
+            </VitalsProvider>
+          </ControlledDrugProvider>
+        </VendorProvider>
       </ThemeProvider>
     </TranslationProvider>
   );

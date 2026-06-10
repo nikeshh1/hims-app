@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
+import {createStackNavigator} from '@react-navigation/stack';
 
 import {
   Articles,
@@ -46,12 +45,23 @@ import {
   CriticalPatients,
 } from '../screens';
 
-import { useScreenOptions, useTranslation } from '../hooks';
+import {useScreenOptions, useTranslation} from '../hooks';
+import VendorList from '../screens/Vendor/VendorList';
+import AddVendor from '../screens/Vendor/AddVendor';
+import ViewVendor from '../screens/Vendor/ViewVendor';
+import TrashVendors from '../screens/Vendor/TrashVendors';
 
+import ControlledDrugList from '../screens/Controlled Drug/ControlledDrugList';
+import AddControlledDrug from '../screens/Controlled Drug/AddControlledDrug';
+import ViewControlledDrug from '../screens/Controlled Drug/ViewControlledDrug';
+import TrashControlledDrugs from '../screens/Controlled Drug/TrashControlledDrugs';
+import DrugLog from '../screens/Controlled Drug/DrugLog';
+import DispenseRecords from '../screens/Controlled Drug/DispenseRecords';
+import NewDispense from '../screens/Controlled Drug/NewDispense';
 const Stack = createStackNavigator();
 
 export default () => {
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const screenOptions = useScreenOptions();
 
   return (
@@ -60,201 +70,267 @@ export default () => {
       <Stack.Screen
         name="Home"
         component={Home}
-        options={{ title: t('navigation.home') }}
+        options={{title: t('navigation.home')}}
       />
       {/* NURSE – PATIENT MONITORING */}
       <Stack.Screen
         name="VitalsList"
         component={VitalsList}
-        options={{ title: 'Patient Monitoring' }}
+        options={{title: 'Patient Monitoring'}}
       />
       <Stack.Screen
         name="AddVital"
         component={AddVital}
-        options={{ title: 'Record Vital' }}
+        options={{title: 'Record Vital'}}
       />
       <Stack.Screen
         name="ViewVital"
         component={ViewVital}
-        options={{ title: 'Vital Details' }}
+        options={{title: 'Vital Details'}}
       />
       <Stack.Screen
         name="TrashVitals"
         component={TrashVitals}
-        options={{ title: 'Deleted Vitals' }}
+        options={{title: 'Deleted Vitals'}}
       />
 
       {/* MEDICATION ADMINISTRATION */}
       <Stack.Screen
         name="MedicationAdministrationList"
         component={MedicationAdministrationList}
-        options={{ title: 'Medication Administration' }}
+        options={{title: 'Medication Administration'}}
       />
       <Stack.Screen
         name="AddMedicationAdministration"
         component={AddMedicationAdministration}
-        options={{ title: 'Add Medication' }}
+        options={{title: 'Add Medication'}}
       />
       <Stack.Screen
         name="ViewMedicationAdministration"
         component={ViewMedicationAdministration}
-        options={{ title: 'Medication Details' }}
+        options={{title: 'Medication Details'}}
       />
       <Stack.Screen
         name="TrashMedicationAdministration"
         component={TrashMedicationAdministration}
-        options={{ title: 'Deleted Medications' }}
+        options={{title: 'Deleted Medications'}}
       />
 
       {/* INFECTION LOGS */}
       <Stack.Screen
         name="InfectionLogsList"
         component={InfectionLogsList}
-        options={{ title: 'Infection Logs' }}
+        options={{title: 'Infection Logs'}}
       />
       <Stack.Screen
         name="AddInfectionLog"
         component={AddInfectionLog}
-        options={{ title: 'Add Infection Log' }}
+        options={{title: 'Add Infection Log'}}
       />
       <Stack.Screen
         name="ViewInfectionLog"
         component={ViewInfectionLog}
-        options={{ title: 'Infection Details' }}
+        options={{title: 'Infection Details'}}
       />
       <Stack.Screen
         name="TrashInfectionLogs"
         component={TrashInfectionLogs}
-        options={{ title: 'Deleted Logs' }}
+        options={{title: 'Deleted Logs'}}
       />
 
       {/* ISOLATION TRACKING */}
       <Stack.Screen
         name="IsolationTrackingList"
         component={IsolationTrackingList}
-        options={{ title: 'Isolation Tracking' }}
+        options={{title: 'Isolation Tracking'}}
       />
       <Stack.Screen
         name="AddIsolationTracking"
         component={AddIsolationTracking}
-        options={{ title: 'Add Isolation Record' }}
+        options={{title: 'Add Isolation Record'}}
       />
       <Stack.Screen
         name="ViewIsolationTracking"
         component={ViewIsolationTracking}
-        options={{ title: 'Isolation Details' }}
+        options={{title: 'Isolation Details'}}
       />
       <Stack.Screen
         name="TrashIsolationTracking"
         component={TrashIsolationTracking}
-        options={{ title: 'Deleted Records' }}
+        options={{title: 'Deleted Records'}}
       />
 
       {/* PPE COMPLIANCE */}
       <Stack.Screen
         name="PpeComplianceList"
         component={PpeComplianceList}
-        options={{ title: 'PPE Compliance' }}
+        options={{title: 'PPE Compliance'}}
       />
       <Stack.Screen
         name="AddPpeCompliance"
         component={AddPpeCompliance}
-        options={{ title: 'Add PPE Record' }}
+        options={{title: 'Add PPE Record'}}
       />
       <Stack.Screen
         name="ViewPpeCompliance"
         component={ViewPpeCompliance}
-        options={{ title: 'PPE Details' }}
+        options={{title: 'PPE Details'}}
       />
       <Stack.Screen
         name="TrashPpeCompliance"
         component={TrashPpeCompliance}
-        options={{ title: 'Deleted Records' }}
+        options={{title: 'Deleted Records'}}
       />
 
       {/* NURSE SHIFTS */}
       <Stack.Screen
         name="NurseShiftsList"
         component={NurseShiftsList}
-        options={{ title: 'Shift Assignments' }}
+        options={{title: 'Shift Assignments'}}
       />
       <Stack.Screen
         name="AddHandover"
         component={AddHandover}
-        options={{ title: 'Add Handover Notes' }}
+        options={{title: 'Add Handover Notes'}}
       />
       <Stack.Screen
         name="ViewHandover"
         component={ViewHandover}
-        options={{ title: 'View Handover Notes' }}
+        options={{title: 'View Handover Notes'}}
       />
       <Stack.Screen
         name="TrashShifts"
         component={TrashShifts}
-        options={{ title: 'Deleted Shifts' }}
+        options={{title: 'Deleted Shifts'}}
       />
 
       {/* DISCHARGE PREPARATION */}
       <Stack.Screen
         name="DischargePreparationList"
         component={DischargePreparationList}
-        options={{ title: 'Discharge Preparation' }}
+        options={{title: 'Discharge Preparation'}}
       />
       <Stack.Screen
         name="AddDischargePreparation"
         component={AddDischargePreparation}
-        options={{ title: 'Discharge Checklist' }}
+        options={{title: 'Discharge Checklist'}}
       />
       <Stack.Screen
         name="ConfirmDischarge"
         component={ConfirmDischarge}
-        options={{ title: 'Confirm Discharge' }}
+        options={{title: 'Confirm Discharge'}}
       />
 
       {/* LAB & REPORT VIEW */}
       <Stack.Screen
         name="LabReportsList"
         component={LabReportsList}
-        options={{ title: 'Lab & Report View' }}
+        options={{title: 'Lab & Report View'}}
       />
       <Stack.Screen
         name="ViewLabReport"
         component={ViewLabReport}
-        options={{ title: 'Report Details' }}
+        options={{title: 'Report Details'}}
       />
 
       {/* NURSE DASHBOARD */}
       <Stack.Screen
         name="NurseDashboard"
         component={NurseDashboard}
-        options={{ title: 'Dashboard' }}
+        options={{title: 'Dashboard'}}
+      />
+      {/* VENDOR MANAGEMENT */}
+      <Stack.Screen
+        name="VendorList"
+        component={VendorList}
+        options={{title: 'Vendors'}}
+      />
+
+      <Stack.Screen
+        name="AddVendor"
+        component={AddVendor}
+        options={{title: 'Add Vendor'}}
+      />
+
+      <Stack.Screen
+        name="ViewVendor"
+        component={ViewVendor}
+        options={{title: 'Vendor Details'}}
+      />
+
+      <Stack.Screen
+        name="TrashVendors"
+        component={TrashVendors}
+        options={{title: 'Deleted Vendors'}}
+      />
+      {/* CONTROLLED DRUGS */}
+      <Stack.Screen
+        name="ControlledDrugList"
+        component={ControlledDrugList}
+        options={{title: 'Controlled Drugs'}}
+      />
+
+      <Stack.Screen
+        name="AddControlledDrug"
+        component={AddControlledDrug}
+        options={{title: 'Add Controlled Drug'}}
+      />
+
+      <Stack.Screen
+        name="ViewControlledDrug"
+        component={ViewControlledDrug}
+        options={{title: 'Drug Details'}}
+      />
+
+      <Stack.Screen
+        name="TrashControlledDrugs"
+        component={TrashControlledDrugs}
+        options={{title: 'Deleted Drugs'}}
+      />
+
+      <Stack.Screen
+        name="DrugLog"
+        component={DrugLog}
+        options={{title: 'Drug Log'}}
+      />
+
+      <Stack.Screen
+        name="DispenseRecords"
+        component={DispenseRecords}
+        options={{title: 'Dispense Records'}}
+      />
+
+      <Stack.Screen
+        name="NewDispense"
+        component={NewDispense}
+        options={{title: 'New Dispense'}}
       />
       <Stack.Screen
         name="CriticalPatients"
         component={CriticalPatients}
-        options={{ title: 'Critical Patients' }}
+        options={{title: 'Critical Patients'}}
       />
 
       {/* NURSE REPORTS */}
       <Stack.Screen
         name="VitalsTrendsReport"
         component={VitalsTrendsReport}
-        options={{ title: 'Vital Trends Report' }}
+        options={{title: 'Vital Trends Report'}}
       />
       <Stack.Screen
         name="MedicationReport"
         component={MedicationReport}
-        options={{ title: 'Medication Report' }}
+        options={{title: 'Medication Report'}}
       />
       <Stack.Screen
         name="ShiftReport"
         component={ShiftReport}
-        options={{ title: 'Shift Report' }}
+        options={{title: 'Shift Report'}}
       />
       <Stack.Screen
         name="PatientSummary"
         component={PatientSummary}
-        options={{ title: 'Patient Summary' }}
+        options={{title: 'Patient Summary'}}
       />
 
       {/* OTHER SCREENS */}
@@ -267,7 +343,7 @@ export default () => {
       <Stack.Screen
         name="Articles"
         component={Articles}
-        options={{ title: t('navigation.articles') }}
+        options={{title: t('navigation.articles')}}
       />
 
       <Stack.Screen name="Pro" component={Pro} options={screenOptions.pro} />
@@ -275,15 +351,14 @@ export default () => {
       <Stack.Screen
         name="Profile"
         component={Profile}
-        options={{ headerShown: false }}
+        options={{headerShown: false}}
       />
 
       <Stack.Screen
         name="Register"
         component={Register}
-        options={{ headerShown: false }}
+        options={{headerShown: false}}
       />
     </Stack.Navigator>
   );
 };
-
