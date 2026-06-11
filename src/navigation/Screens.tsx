@@ -58,6 +58,10 @@ import TrashControlledDrugs from '../screens/Controlled Drug/TrashControlledDrug
 import DrugLog from '../screens/Controlled Drug/DrugLog';
 import DispenseRecords from '../screens/Controlled Drug/DispenseRecords';
 import NewDispense from '../screens/Controlled Drug/NewDispense';
+import AppointmentList from '../screens/Appointment/AppointmentList';
+import AddAppointment from '../screens/Appointment/AddAppointment';
+import ViewAppointment from '../screens/Appointment/ViewAppointment';
+import TrashAppointments from '../screens/Appointment/TrashAppointments';
 const Stack = createStackNavigator();
 
 export default () => {
@@ -310,7 +314,30 @@ export default () => {
         component={CriticalPatients}
         options={{title: 'Critical Patients'}}
       />
+      {/* APPOINTMENTS */}
+      <Stack.Screen
+        name="AppointmentList"
+        component={AppointmentList}
+        options={{title: 'Appointments'}}
+      />
+      
+      <Stack.Screen
+        name="AddAppointment"
+        component={AddAppointment}
+        options={{title: 'Add Appointment'}}
+      />
 
+      <Stack.Screen
+        name="ViewAppointment"
+        component={ViewAppointment}
+        options={{title: 'Appointment Details'}}
+      />
+
+      <Stack.Screen
+        name="TrashAppointments"
+        component={TrashAppointments}
+        options={{title: 'Deleted Appointments'}}
+      />
       {/* NURSE REPORTS */}
       <Stack.Screen
         name="VitalsTrendsReport"

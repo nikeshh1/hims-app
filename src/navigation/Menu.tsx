@@ -96,6 +96,7 @@ const DrawerContent = (
     {name: 'Shift Assignments', to: 'NurseShiftsList', icon: assets.document},
     {name: 'Discharge Preparation', to: 'DischargePreparationList', icon: assets.document},
     {name: 'Lab & Report View', to: 'LabReportsList', icon: assets.document},
+    {name: 'Appointments', to: 'AppointmentList', icon: assets.document},
     {name: 'Vendors', to: 'VendorList', icon: assets.document},
     {name: 'Controlled Drugs', to: 'ControlledDrugList', icon: assets.document},
     {name: 'Vital Trends Report', to: 'VitalsTrendsReport', icon: assets.document, section: 'Reports'},

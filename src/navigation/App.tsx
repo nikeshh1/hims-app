@@ -5,7 +5,12 @@ import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
 import Menu from './Menu';
 
-import {DataProvider, useData, ThemeProvider, TranslationProvider} from '../hooks';
+import {
+  DataProvider,
+  useData,
+  ThemeProvider,
+  TranslationProvider,
+} from '../hooks';
 import {VitalsProvider} from '../context/VitalsContext';
 import {MedicationProvider} from '../context/MedicationAdministrationContext';
 import {PpeProvider} from '../context/PpeComplianceContext';
@@ -17,7 +22,7 @@ import {DashboardProvider} from '../context/DashboardContext';
 
 import {VendorProvider} from '../context/VendorContext';
 import {ControlledDrugProvider} from '../context/ControlledDrugContext';
-
+import {AppointmentProvider} from '../context/AppointmentContext';
 SplashScreen.preventAutoHideAsync();
 
 function NavigationContent() {
@@ -66,25 +71,27 @@ function NavigationContent() {
       <ThemeProvider theme={theme} setTheme={setTheme}>
         <VendorProvider>
           <ControlledDrugProvider>
-            <VitalsProvider>
-              <MedicationProvider>
-                <PpeProvider>
-                  <NurseShiftsProvider>
-                    <DischargeProvider>
-                      <LabReportsProvider>
-                        <NurseReportsProvider>
-                          <DashboardProvider>
-                            <NavigationContainer theme={navigationTheme}>
-                              <Menu />
-                            </NavigationContainer>
-                          </DashboardProvider>
-                        </NurseReportsProvider>
-                      </LabReportsProvider>
-                    </DischargeProvider>
-                  </NurseShiftsProvider>
-                </PpeProvider>
-              </MedicationProvider>
-            </VitalsProvider>
+            <AppointmentProvider>
+              <VitalsProvider>
+                <MedicationProvider>
+                  <PpeProvider>
+                    <NurseShiftsProvider>
+                      <DischargeProvider>
+                        <LabReportsProvider>
+                          <NurseReportsProvider>
+                            <DashboardProvider>
+                              <NavigationContainer theme={navigationTheme}>
+                                <Menu />
+                              </NavigationContainer>
+                            </DashboardProvider>
+                          </NurseReportsProvider>
+                        </LabReportsProvider>
+                      </DischargeProvider>
+                    </NurseShiftsProvider>
+                  </PpeProvider>
+                </MedicationProvider>
+              </VitalsProvider>
+            </AppointmentProvider>
           </ControlledDrugProvider>
         </VendorProvider>
       </ThemeProvider>
