@@ -112,39 +112,62 @@ const TrashInfectionLogs = () => {
   });
 
   const renderItem = ({ item }: { item: any }) => (
-    <View style={styles.card}>
-      <Text bold size={15}>
-        {item.patient?.first_name || ''} {item.patient?.last_name || ''}
-      </Text>
-      <Text gray size={12} style={{ marginTop: 4 }}>
-        {item.infection_type || '-'}
-      </Text>
+  <View style={styles.card}>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+      <View style={{ flex: 1 }}>
+        <Text bold size={16} style={{ color: '#2d3748' }}>
+          {item.patient?.first_name || ''} {item.patient?.last_name || ''}
+        </Text>
 
-      <View style={styles.cardActions}>
+        <Text style={styles.infoText}>
+          Infection: {item.infection_type || '-'}
+        </Text>
+
+        <Text style={styles.infoText}>
+          Status: {item.status || '-'}
+        </Text>
+
+        <Text style={styles.infoText}>
+          Severity: {item.severity || '-'}
+        </Text>
+
+        <Text style={styles.dateText}>
+          {item.created_at
+            ? new Date(item.created_at).toLocaleDateString()
+            : '-'}
+        </Text>
+      </View>
+
+      <View style={styles.actionColumn}>
         <TouchableOpacity
-          style={[styles.actionBtn, { backgroundColor: '#e8f5e9' }]}
-          onPress={() => handleRestore(item.id)}
-        >
-          <Text size={12} color="#2e7d32" bold>Restore</Text>
+          style={[styles.verticalBtn, { backgroundColor: '#e8f5e9' }]}
+          onPress={() => handleRestore(item.id)}>
+          <Text bold color="#2e7d32">
+            RESTORE
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.actionBtn, { backgroundColor: '#ffcdd2' }]}
-          onPress={() => handlePermanentDelete(item.id)}
-        >
-          <Text size={12} color="#c62828" bold>Delete</Text>
+          style={[
+            styles.verticalBtn,
+            { backgroundColor: '#fce4ec', marginTop: 10 },
+          ]}
+          onPress={() => handlePermanentDelete(item.id)}>
+          <Text bold color="#c62828">
+            DELETE
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
-  );
+  </View>
+);
 
   return (
     <Block safe>
       <Block scroll={false} paddingHorizontal={sizes.padding} style={{ flex: 1 }}>
         <View style={styles.header}>
-          <Text bold size={20}>Deleted Logs</Text>
-        </View>
-
+  <Text bold size={20}>Deleted Infection Logs</Text>
+</View>
         <View style={styles.searchContainer}>
           <Input
             search
@@ -181,16 +204,37 @@ const styles = StyleSheet.create({
   searchContainer: { marginVertical: 12 },
   center: { justifyContent: 'center', alignItems: 'center', marginTop: 40 },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#d32f2f',
-    elevation: 2,
-  },
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 14,
+  marginBottom: 16,
+  elevation: 2,
+},
   cardActions: { flexDirection: 'row', gap: 8, marginTop: 10 },
   actionBtn: { flex: 1, paddingVertical: 8, borderRadius: 4, alignItems: 'center' },
+  infoText: {
+  marginTop: 8,
+  color: '#4a5568',
+  fontSize: 14,
+},
+
+dateText: {
+  marginTop: 12,
+  color: '#4a5568',
+  fontSize: 14,
+},
+
+actionColumn: {
+  justifyContent: 'center',
+},
+
+verticalBtn: {
+  width: 110,
+  height: 46,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 8,
+},
 });
 
 export default TrashInfectionLogs;

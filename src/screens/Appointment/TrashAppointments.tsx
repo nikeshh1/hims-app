@@ -8,7 +8,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
-import {getDeletedAppointments, restoreAppointment, forceDeleteAppointment} from '../../api/appointment';
+import {
+  getDeletedAppointments,
+  restoreAppointment,
+  forceDeleteAppointment,
+} from '../../api/appointment';
 import {useAppointments} from '../../context/AppointmentContext';
 import {useTheme} from '../../hooks';
 import {Block, Text, Input} from '../../components';
@@ -23,11 +27,15 @@ const TrashAppointments = () => {
 
   const fetchDeleted = useCallback(async () => {
     setLoading(true);
+
     try {
       const res = await getDeletedAppointments();
       setDeleted(res.data?.data || []);
     } catch (err) {
-      console.error('Failed to load deleted appointments:', err);
+      console.error(
+        'Failed to load deleted appointments:',
+        err,
+      );
       setDeleted([]);
     } finally {
       setLoading(false);
@@ -41,113 +49,272 @@ const TrashAppointments = () => {
   );
 
   const filtered = useMemo(() => {
-    if (!searchQuery.trim()) return deleted;
+    if (!searchQuery.trim()) {
+      return deleted;
+    }
+
     const q = searchQuery.toLowerCase();
+
     return deleted.filter(
-      (a) =>
-        (a.patient?.first_name || '').toLowerCase().includes(q) ||
-        (a.patient?.last_name || '').toLowerCase().includes(q) ||
-        (a.doctor?.name || '').toLowerCase().includes(q),
+      a =>
+        (a.patient?.first_name || '')
+          .toLowerCase()
+          .includes(q) ||
+        (a.patient?.last_name || '')
+          .toLowerCase()
+          .includes(q) ||
+        (a.doctor?.name || '')
+          .toLowerCase()
+          .includes(q),
     );
   }, [deleted, searchQuery]);
 
   const handleRestore = (item: any) => {
-    Alert.alert('Restore', 'Restore this appointment?', [
-      {text: 'Cancel', style: 'cancel'},
-      {
-        text: 'Restore',
-        onPress: async () => {
-          try {
-            await restoreAppointment(item.id);
-            await fetchDeleted();
-            await refreshAppointments();
-            Alert.alert('Done', 'Appointment restored');
-          } catch (err: any) {
-            Alert.alert('Error', err?.response?.data?.message || 'Restore failed');
-          }
+    Alert.alert(
+      'Restore',
+      'Restore this appointment?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
         },
-      },
-    ]);
+        {
+          text: 'Restore',
+          onPress: async () => {
+            try {
+              await restoreAppointment(
+                item.id,
+              );
+
+              await fetchDeleted();
+              await refreshAppointments();
+
+              Alert.alert(
+                'Done',
+                'Appointment restored',
+              );
+            } catch (err: any) {
+              Alert.alert(
+                'Error',
+                err?.response?.data
+                  ?.message ||
+                  'Restore failed',
+              );
+            }
+          },
+        },
+      ],
+    );
   };
 
-  const handleForceDelete = (item: any) => {
-    Alert.alert('Permanent Delete', 'This cannot be undone.', [
-      {text: 'Cancel', style: 'cancel'},
-      {
-        text: 'Delete Forever',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await forceDeleteAppointment(item.id);
-            await fetchDeleted();
-            Alert.alert('Done', 'Appointment permanently deleted');
-          } catch (err: any) {
-            Alert.alert('Error', err?.response?.data?.message || 'Delete failed');
-          }
+  const handleForceDelete = (
+    item: any,
+  ) => {
+    Alert.alert(
+      'Permanent Delete',
+      'This cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
         },
-      },
-    ]);
+        {
+          text: 'Delete Forever',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await forceDeleteAppointment(
+                item.id,
+              );
+
+              await fetchDeleted();
+
+              Alert.alert(
+                'Done',
+                'Appointment permanently deleted',
+              );
+            } catch (err: any) {
+              Alert.alert(
+                'Error',
+                err?.response?.data
+                  ?.message ||
+                  'Delete failed',
+              );
+            }
+          },
+        },
+      ],
+    );
   };
 
   const renderItem = ({item}: {item: any}) => (
     <View style={styles.card}>
-      <Text bold size={15}>
-        {item.patient?.first_name || ''} {item.patient?.last_name || ''}
-      </Text>
-      <Text gray size={13} style={{marginTop: 4}}>
-        👨‍⚕️ Dr. {item.doctor?.name || '-'}
-      </Text>
-      <Text gray size={13} style={{marginTop: 2}}>
-        📅 {item.appointment_date}  ⏰ {item.appointment_time}
-      </Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent:
+            'space-between',
+        }}>
+        <View style={{flex: 1}}>
+          <Text
+            bold
+            size={16}
+            style={{
+              color: '#2d3748',
+            }}>
+            {item.patient
+              ?.first_name || ''}{' '}
+            {item.patient
+              ?.last_name || ''}
+          </Text>
 
-      <View style={styles.cardActions}>
-        <TouchableOpacity
-          style={[styles.actionBtn, {backgroundColor: '#e8f5e9'}]}
-          onPress={() => handleRestore(item)}>
-          <Text size={12} color="#2e7d32" bold>Restore</Text>
-        </TouchableOpacity>
+          <Text style={styles.infoText}>
+            Doctor:{' '}
+            {item.doctor?.name ||
+              '-'}
+          </Text>
 
-        <TouchableOpacity
-          style={[styles.actionBtn, {backgroundColor: '#fce4ec'}]}
-          onPress={() => handleForceDelete(item)}>
-          <Text size={12} color="#c62828" bold>Delete Forever</Text>
-        </TouchableOpacity>
+          <Text style={styles.infoText}>
+            Date:{' '}
+            {item.appointment_date ||
+              '-'}
+          </Text>
+
+          <Text style={styles.infoText}>
+            Time:{' '}
+            {item.appointment_time ||
+              '-'}
+          </Text>
+
+          <Text style={styles.infoText}>
+            Status:{' '}
+            {item.appointment_status ||
+              '-'}
+          </Text>
+        </View>
+
+        <View
+          style={
+            styles.actionColumn
+          }>
+          <TouchableOpacity
+            style={[
+              styles.verticalBtn,
+              {
+                backgroundColor:
+                  '#e8f5e9',
+              },
+            ]}
+            onPress={() =>
+              handleRestore(item)
+            }>
+            <Text
+              bold
+              color="#2e7d32">
+              RESTORE
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.verticalBtn,
+              {
+                backgroundColor:
+                  '#fce4ec',
+                marginTop: 4,
+              },
+            ]}
+            onPress={() =>
+              handleForceDelete(
+                item,
+              )
+            }>
+            <Text
+              bold
+              color="#c62828">
+              DELETE
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 
   return (
     <Block safe>
-      <Block scroll={false} paddingHorizontal={sizes.padding} style={{flex: 1}}>
+      <Block
+        scroll={false}
+        paddingHorizontal={
+          sizes.padding
+        }
+        style={{flex: 1}}>
         <View style={styles.header}>
-          <Text bold size={20}>Deleted Appointments</Text>
+          <Text
+            bold
+            size={20}>
+            Deleted Appointments
+          </Text>
         </View>
 
-        <View style={styles.searchContainer}>
+        <View
+          style={
+            styles.searchContainer
+          }>
           <Input
             search
             placeholder="Search deleted appointments..."
-            onChangeText={(text: string) => setSearchQuery(text)}
-            value={searchQuery}
+            onChangeText={(
+              text: string,
+            ) =>
+              setSearchQuery(
+                text,
+              )
+            }
+            value={
+              searchQuery
+            }
           />
         </View>
 
         {loading ? (
-          <View style={styles.center}>
-            <ActivityIndicator size="large" color="#cb0c9f" />
+          <View
+            style={
+              styles.center
+            }>
+            <ActivityIndicator
+              size="large"
+              color="#cb0c9f"
+            />
           </View>
-        ) : filtered.length === 0 ? (
-          <View style={styles.center}>
-            <Text gray size={16}>No deleted appointments</Text>
+        ) : filtered.length ===
+          0 ? (
+          <View
+            style={
+              styles.center
+            }>
+            <Text
+              gray
+              size={16}>
+              No deleted appointments
+            </Text>
           </View>
         ) : (
           <FlatList
             data={filtered}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: 40}}
+            keyExtractor={item =>
+              String(
+                item.id,
+              )
+            }
+            renderItem={
+              renderItem
+            }
+            showsVerticalScrollIndicator={
+              false
+            }
+            contentContainerStyle={{
+              paddingBottom: 40,
+            }}
           />
         )}
       </Block>
@@ -156,34 +323,48 @@ const TrashAppointments = () => {
 };
 
 const styles = StyleSheet.create({
-  header: {marginTop: 16, marginBottom: 8},
-  searchContainer: {marginBottom: 8},
+  header: {
+    marginVertical: 16,
+  },
+
+  searchContainer: {
+    marginVertical: 12,
+  },
+
+  center: {
+    flex: 1,
+    justifyContent:
+      'center',
+    alignItems: 'center',
+    paddingTop: 60,
+  },
+
   card: {
     backgroundColor: '#fff',
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    padding: 14,
+    marginBottom: 16,
     elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowOffset: {width: 0, height: 2},
-    shadowRadius: 6,
   },
-  cardActions: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 12,
+
+  infoText: {
+    marginTop: 6,
+    color: '#4a5568',
+    fontSize: 14,
   },
-  actionBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 6,
+
+  actionColumn: {
+    justifyContent:
+      'center',
   },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
+
+  verticalBtn: {
+    width: 90,
+    height: 38,
+    justifyContent:
+      'center',
     alignItems: 'center',
-    paddingTop: 60,
+    borderRadius: 6,
   },
 });
 

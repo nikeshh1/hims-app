@@ -1,153 +1,215 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  Alert,
   FlatList,
   StyleSheet,
   TouchableOpacity,
   View,
   ActivityIndicator,
 } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { useDischarge } from '../../context/DischargePreparationContext';
-import { useTheme } from '../../hooks';
-import { Block, Text, Input } from '../../components';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {useDischarge} from '../../context/DischargePreparationContext';
+import {useTheme} from '../../hooks';
+import {Block, Text, Input} from '../../components';
 
 const DischargePreparationList = () => {
   const navigation = useNavigation<any>();
-  const { admissions, loading, fetchAdmissions } = useDischarge();
-  const { sizes } = useTheme();
+  const {admissions, loading, fetchAdmissions} = useDischarge();
+  const {sizes} = useTheme();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filtered, setFiltered] = useState(admissions);
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log('DischargePreparationList focused - refetching data');
       fetchAdmissions();
     }, []),
   );
 
   useEffect(() => {
     const query = searchQuery.toLowerCase();
+
     const result = admissions.filter((adm: any) => {
-      const patientName = (adm.patient?.name || adm.patient_name || '').toLowerCase();
+      const patientName = (
+        adm.patient?.name ||
+        adm.patient_name ||
+        ''
+      ).toLowerCase();
+
       const wardName = (adm.ward || '').toLowerCase();
+
       return patientName.includes(query) || wardName.includes(query);
     });
+
     setFiltered(result);
   }, [searchQuery, admissions]);
 
-  const getStatusColor = (prep: any) => {
-    if (!prep) return '#6c757d'; // Not Started - Gray
-    if (prep.is_ready || prep.status === 'ready') return '#28a745'; // Ready - Green
-    if (prep.status === 'in_progress') return '#ffc107'; // In Progress - Orange
-    return '#6c757d'; // Not Started - Gray
-  };
-
   const getStatusLabel = (prep: any) => {
-    if (!prep) return 'Not Started';
-    if (prep.is_ready || prep.status === 'ready') return 'Ready';
-    if (prep.status === 'in_progress') return 'In Progress';
+    if (!prep) {
+      return 'Not Started';
+    }
+
+    if (prep.is_ready || prep.status === 'ready') {
+      return 'Ready';
+    }
+
+    if (prep.status === 'in_progress') {
+      return 'In Progress';
+    }
+
     return 'Not Started';
   };
 
-  const renderItem = ({ item }: any) => {
-    const prep = item.discharge_preparation;
-    const patientName = item.patient?.name || item.patient_name || 'Unknown';
-    
-    // Ward is directly on the item object
-    const wardName = item.ward || 'N/A';
-    
-    const statusColor = getStatusColor(prep);
-    
-    console.log('List item:', {
-      patientName,
-      admissionId: item.admission_id,
-      prep: prep ? { is_ready: prep.is_ready, status: prep.status } : 'NO PREP',
-    });
+  const renderItem = ({item}: any) => {
+  const prep = item.discharge_preparation;
 
-    return (
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text bold size={15} style={{ flex: 1 }}>
+  const patientName =
+    item.patient?.name ||
+    item.patient_name ||
+    'Unknown';
+
+  const wardName =
+    item.ward || 'N/A';
+
+  return (
+    <View style={styles.card}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}>
+        <View style={{flex: 1}}>
+          <Text
+            bold
+            size={16}
+            style={{
+              color: '#2d3748',
+            }}>
             {patientName}
           </Text>
-          <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
-            <Text white bold size={11}>
-              {getStatusLabel(prep)}
-            </Text>
-          </View>
+
+          <Text style={styles.infoText}>
+            Admission:{' '}
+            {item.admission_id ||
+              item.ipd_id ||
+              'N/A'}
+          </Text>
+
+          <Text style={styles.infoText}>
+            Ward: {wardName}
+          </Text>
+
+          <Text style={styles.infoText}>
+            Status:{' '}
+            {getStatusLabel(prep)}
+          </Text>
         </View>
 
-        <Text gray size={13} style={{ marginTop: 4 }}>
-          📋 Admission: {item.admission_id || item.ipd_id || 'N/A'}
-        </Text>
-
-        <Text gray size={13} style={{ marginTop: 4 }}>
-          🏥 Ward: {wardName}
-        </Text>
-
-        {prep && (
-          <Text gray size={13} style={{ marginTop: 4 }}>
-            ✓ Checklist: {prep.checklist?.filter((c: any) => c.completed).length || 0}/{prep.checklist?.length || 0}
-          </Text>
-        )}
-
-        <View style={styles.cardActions}>
+        <View style={styles.actionColumn}>
           <TouchableOpacity
-            style={[styles.actionBtn, { backgroundColor: '#e3f2fd', flex: 1 }]}
+            style={[
+              styles.verticalBtn,
+              {
+                backgroundColor:
+                  '#e3f2fd',
+              },
+            ]}
             onPress={() =>
-              navigation.navigate('AddDischargePreparation', {
-                admissionId: item.ipd_id || item.id,
-                admission: item,
-              })
-            }
-          >
-            <Text size={12} color="#1565c0" bold>
-              {prep ? 'Continue' : 'Prepare'}
+              navigation.navigate(
+                'AddDischargePreparation',
+                {
+                  admissionId:
+                    item.ipd_id ||
+                    item.id,
+                  admission: item,
+                },
+              )
+            }>
+            <Text
+              bold
+              color="#1565c0">
+              {prep
+                ? 'CONTINUE'
+                : 'PREPARE'}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionBtn, { backgroundColor: '#f0f0f0', flex: 1, marginLeft: 8 }]}
+            style={[
+              styles.verticalBtn,
+              {
+                backgroundColor:
+                  '#f0f0f0',
+                marginTop: 4,
+              },
+            ]}
             onPress={() =>
-              navigation.navigate('ConfirmDischarge', { admission: item, discharge: prep })
-            }
-          >
-            <Text size={12} color="#333" bold>View</Text>
+              navigation.navigate(
+                'ConfirmDischarge',
+                {
+                  admission: item,
+                  discharge: prep,
+                },
+              )
+            }>
+            <Text
+              bold
+              color="#333">
+              VIEW
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
-    );
-  };
+    </View>
+  );
+};
 
   return (
     <Block safe>
-      <Block scroll={false} paddingHorizontal={sizes.padding} style={{ flex: 1 }}>
-        <View style={styles.header}>
-          <Text bold size={20}>Discharge Preparation</Text>
-        </View>
+      <Block scroll={false} paddingHorizontal={sizes.padding} style={{flex: 1}}>
+        {/* HEADER */}
+        <View style={styles.pageHeader}>
+  <View>
+    <Text style={styles.pageTitle}>
+      Discharge Preparation
+    </Text>
 
+    <Text style={styles.breadcrumb}>
+      Nurse / Discharge Preparation
+    </Text>
+  </View>
+</View>
+
+        {/* SEARCH */}
         <View style={styles.searchContainer}>
           <Input
             search
-            placeholder="Search by patient name or bed..."
+            placeholder="Search by patient name or ward..."
             onChangeText={(text: string) => setSearchQuery(text)}
             value={searchQuery}
           />
         </View>
 
         {loading && admissions.length === 0 ? (
-          <ActivityIndicator size="large" />
+          <View style={styles.center}>
+            <ActivityIndicator size="large" color="#cb0c9f" />
+          </View>
         ) : filtered.length > 0 ? (
           <FlatList
             data={filtered}
             renderItem={renderItem}
-            keyExtractor={(item, index) => item?.id || `admission-${index}`}
-            scrollEnabled={true}
+            keyExtractor={(item, index) =>
+              String(item?.id || `admission-${index}`)
+            }
+            contentContainerStyle={{
+              paddingBottom: 20,
+            }}
+            showsVerticalScrollIndicator={false}
           />
         ) : (
           <View style={styles.center}>
-            <Text gray>No active admissions</Text>
+            <Text gray size={14}>
+              No active admissions
+            </Text>
           </View>
         )}
       </Block>
@@ -156,42 +218,66 @@ const DischargePreparationList = () => {
 };
 
 const styles = StyleSheet.create({
-  header: {
-    paddingVertical: 12,
-  },
-  searchContainer: {
-    marginBottom: 16,
-  },
-  card: {
+  pageHeader: {
     backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
+    borderRadius: 12,
+    padding: 18,
+    marginTop: 12,
     marginBottom: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#17a2b8',
-    elevation: 1,
-  },
-  cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    elevation: 2,
   },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
+
+  pageTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#2d3748',
   },
-  cardActions: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 12,
+
+  breadcrumb: {
+    marginTop: 6,
+    color: '#4a5568',
   },
-  actionBtn: {
-    flex: 1,
-    paddingVertical: 8,
-    borderRadius: 4,
+
+  primaryButton: {
+    backgroundColor: '#cb0c9f',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+
+  searchContainer: {
+    marginVertical: 12,
+  },
+
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 16,
+    elevation: 2,
+  },
+
+  infoText: {
+    marginTop: 8,
+    color: '#4a5568',
+    fontSize: 14,
+  },
+
+  actionColumn: {
+    justifyContent: 'center',
+  },
+
+  verticalBtn: {
+    width: 90,
+    height: 38,
+    justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 6,
   },
+
   center: {
     flex: 1,
     justifyContent: 'center',

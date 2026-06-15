@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   Alert,
   FlatList,
@@ -7,15 +7,15 @@ import {
   View,
   ActivityIndicator,
 } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { useTheme } from '../../hooks';
-import { Block, Text, Input } from '../../components';
-import { colors } from '../../constants';
-import { getInfectionLogs, deleteInfectionLog } from '../../api/infectionLogs';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {useTheme} from '../../hooks';
+import {Block, Text, Input} from '../../components';
+import {colors} from '../../constants';
+import {getInfectionLogs, deleteInfectionLog} from '../../api/infectionLogs';
 
 const InfectionLogsList = () => {
   const navigation = useNavigation<any>();
-  const { sizes } = useTheme();
+  const {sizes} = useTheme();
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,7 +23,7 @@ const InfectionLogsList = () => {
   useFocusEffect(
     React.useCallback(() => {
       refreshData();
-    }, [])
+    }, []),
   );
 
   const refreshData = async () => {
@@ -47,7 +47,7 @@ const InfectionLogsList = () => {
         (l) =>
           (l.patient?.first_name || '').toLowerCase().includes(q) ||
           (l.patient?.last_name || '').toLowerCase().includes(q) ||
-          (l.infection_type || '').toLowerCase().includes(q)
+          (l.infection_type || '').toLowerCase().includes(q),
       );
     }
     return result;
@@ -58,7 +58,7 @@ const InfectionLogsList = () => {
       'Delete Log',
       `Delete infection log for "${item.patient?.first_name || ''} ${item.patient?.last_name || ''}"?`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        {text: 'Cancel', style: 'cancel'},
         {
           text: 'Delete',
           style: 'destructive',
@@ -68,105 +68,115 @@ const InfectionLogsList = () => {
               Alert.alert('Deleted', 'Log removed');
               refreshData();
             } catch (err: any) {
-              Alert.alert('Error', err?.response?.data?.message || 'Cannot delete');
+              Alert.alert(
+                'Error',
+                err?.response?.data?.message || 'Cannot delete',
+              );
             }
           },
         },
-      ]
+      ],
     );
   };
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity?.toLowerCase()) {
-      case 'critical':
-        return '#d32f2f';
-      case 'high':
-        return '#f57c00';
-      case 'medium':
-        return '#fbc02d';
-      case 'low':
-        return '#388e3c';
-      default:
-        return '#757575';
-    }
-  };
 
-  const renderItem = ({ item }: { item: any }) => (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <Text bold size={15} style={{ flex: 1 }}>
-          {item.patient?.first_name || ''} {item.patient?.last_name || ''}
+ const renderItem = ({item}: {item: any}) => (
+  <View style={styles.card}>
+    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+      <View style={{flex: 1}}>
+        <Text bold size={16} style={{color: '#2d3748'}}>
+          {item.patient?.first_name || ''}{' '}
+          {item.patient?.last_name || ''}
         </Text>
-        <View style={[styles.severityBadge, { backgroundColor: getSeverityColor(item.severity) }]}>
-          <Text size={11} color="#fff" bold>{item.severity}</Text>
-        </View>
+
+        <Text size={14} style={{marginTop: 6, color: '#4a5568'}}>
+  🦠 {item.infection_type || '-'}
+</Text>
+
+<Text size={14} style={{marginTop: 4, color: '#4a5568'}}>
+  Status: {item.status || '-'}
+</Text>
+
+<Text size={14} style={{marginTop: 4, color: '#4a5568'}}>
+  Severity: {item.severity || '-'}
+</Text>
+
+<Text size={14} style={{marginTop: 6, color: '#4a5568'}}>
+  📅 {item.created_at
+    ? new Date(item.created_at).toLocaleDateString()
+    : '-'}
+</Text>
       </View>
 
-      <Text gray size={13} style={{ marginTop: 4 }}>
-        🦠 {item.infection_type || '-'}
-      </Text>
-
-      <View style={styles.detailsRow}>
-        <Text gray size={12}>Status: {item.status || '-'}</Text>
-      </View>
-
-      {item.symptoms && (
-        <Text gray size={12} style={{ marginTop: 4 }}>
-          Symptoms: {item.symptoms.substring(0, 50)}...
-        </Text>
-      )}
-
-      <Text gray size={12} style={{ marginTop: 4, fontStyle: 'italic' }}>
-        {item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}
-      </Text>
-
-      <View style={styles.cardActions}>
+      <View style={styles.actionColumn}>
         <TouchableOpacity
-          style={[styles.actionBtn, { backgroundColor: '#e8f5e9' }]}
-          onPress={() => navigation.navigate('ViewInfectionLog', { id: item.id })}
-        >
-          <Text size={12} color="#2e7d32" bold>View</Text>
+          style={[
+            styles.verticalBtn,
+            {backgroundColor: '#e8f5e9'},
+          ]}
+          onPress={() =>
+            navigation.navigate('ViewInfectionLog', {
+              id: item.id,
+            })
+          }>
+          <Text bold color="#2e7d32">
+            VIEW
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.actionBtn, { backgroundColor: '#e3f2fd' }]}
-          onPress={() => navigation.navigate('AddInfectionLog', { editData: item })}
-        >
-          <Text size={12} color="#1565c0" bold>Edit</Text>
+          style={[
+            styles.verticalBtn,
+            {
+              backgroundColor: '#e3f2fd',
+              marginTop: 4,
+            },
+          ]}
+          onPress={() =>
+            navigation.navigate('AddInfectionLog', {
+              editData: item,
+            })
+          }>
+          <Text bold color="#1565c0">
+            EDIT
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.actionBtn, { backgroundColor: '#fce4ec' }]}
-          onPress={() => handleDelete(item)}
-        >
-          <Text size={12} color="#c62828" bold>Delete</Text>
+          style={[
+            styles.verticalBtn,
+            {
+              backgroundColor: '#fce4ec',
+              marginTop: 4,
+            },
+          ]}
+          onPress={() => handleDelete(item)}>
+          <Text bold color="#c62828">
+            DELETE
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
-  );
-
+  </View>
+);
   return (
     <Block safe>
-      <Block scroll={false} paddingHorizontal={sizes.padding} style={{ flex: 1 }}>
-        <View style={styles.header}>
-          <Text bold size={20}>Infection Logs</Text>
-        </View>
+      <Block scroll={false} paddingHorizontal={sizes.padding} style={{flex: 1}}>
+        <View style={styles.pageHeader}>
+  <View>
+    <Text style={styles.pageTitle}>Infection Logs</Text>
+    <Text style={styles.breadcrumb}>Nurse / Infection Logs</Text>
+  </View>
 
-        <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={[styles.addBtn, { backgroundColor: '#6c757d' }]}
-            onPress={() => navigation.navigate('TrashInfectionLogs')}
-          >
-            <Text bold color="#fff" size={14}>Deleted</Text>
-          </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.primaryButton}
+    onPress={() => navigation.navigate('AddInfectionLog')}>
+    <Text color="#fff" bold>
+      + NEW LOG
+    </Text>
+  </TouchableOpacity>
+</View>
 
-          <TouchableOpacity
-            style={[styles.addBtn, { backgroundColor: colors.primary }]}
-            onPress={() => navigation.navigate('AddInfectionLog')}
-          >
-            <Text bold color="#fff" size={14}>+ New Log</Text>
-          </TouchableOpacity>
-        </View>
 
         <View style={styles.searchContainer}>
           <Input
@@ -176,7 +186,13 @@ const InfectionLogsList = () => {
             value={searchQuery}
           />
         </View>
-
+      <TouchableOpacity
+  style={styles.deletedButton}
+  onPress={() => navigation.navigate('TrashInfectionLogs')}>
+  <Text bold color="#fff" size={15}>
+    Deleted Records
+  </Text>
+</TouchableOpacity>
         {loading ? (
           <View style={styles.center}>
             <ActivityIndicator size="large" color="#007AFF" />
@@ -185,13 +201,15 @@ const InfectionLogsList = () => {
           <FlatList
             data={filtered}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             scrollEnabled={true}
-            contentContainerStyle={{ paddingBottom: 20 }}
+            contentContainerStyle={{paddingBottom: 20}}
           />
         ) : (
           <View style={styles.center}>
-            <Text gray size={14}>No infection logs found</Text>
+            <Text gray size={14}>
+              No infection logs found
+            </Text>
           </View>
         )}
       </Block>
@@ -200,31 +218,75 @@ const InfectionLogsList = () => {
 };
 
 const styles = StyleSheet.create({
-  header: { marginVertical: 16 },
-  actionRow: { flexDirection: 'row', gap: 10, marginVertical: 10 },
-  addBtn: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  searchContainer: { marginVertical: 12 },
-  center: { justifyContent: 'center', alignItems: 'center', marginTop: 40 },
+  searchContainer: {marginVertical: 12},
+  center: {justifyContent: 'center', alignItems: 'center', marginTop: 40},
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#d32f2f',
-    elevation: 2,
-  },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  severityBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4 },
-  detailsRow: { marginTop: 8 },
-  cardActions: { flexDirection: 'row', gap: 8, marginTop: 10 },
-  actionBtn: { flex: 1, paddingVertical: 8, borderRadius: 4, alignItems: 'center' },
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 14, // was 18
+  marginBottom: 16,
+  elevation: 2,
+},
+  pageHeader: {
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 18,
+  marginTop: 12,
+  marginBottom: 12,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  elevation: 2,
+},
+
+pageTitle: {
+  fontSize: 18,
+  fontWeight: '700',
+  color: '#2d3748',
+},
+
+breadcrumb: {
+  marginTop: 6,
+  color: '#4a5568',
+},
+
+primaryButton: {
+  backgroundColor: '#cb0c9f',
+  paddingHorizontal: 18,
+  paddingVertical: 12,
+  borderRadius: 8,
+},
+
+actionColumn: {
+  justifyContent: 'center',
+},
+
+verticalBtn: {
+  width: 90,
+  height: 38,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 6,
+},
+actionRow: {
+  flexDirection: 'row',
+  gap: 10,
+  marginBottom: 12,
+},
+addBtn: {
+  flex: 1,
+  paddingVertical: 12,
+  borderRadius: 8,
+  alignItems: 'center',
+},
+deletedButton: {
+  backgroundColor: '#6c757d',
+  height: 40,
+  borderRadius: 6,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: 16,
+},
 });
 
 export default InfectionLogsList;

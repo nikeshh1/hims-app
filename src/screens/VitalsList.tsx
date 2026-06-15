@@ -54,7 +54,10 @@ const VitalsList = () => {
               await removeVital(item.id);
               Alert.alert('Deleted', 'Vital record removed');
             } catch (err: any) {
-              Alert.alert('Error', err?.response?.data?.message || 'Cannot delete');
+              Alert.alert(
+                'Error',
+                err?.response?.data?.message || 'Cannot delete',
+              );
             }
           },
         },
@@ -74,43 +77,89 @@ const VitalsList = () => {
 
   const renderItem = ({item}: {item: any}) => (
     <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <Text bold size={15} style={{flex: 1}}>
+      <View style={{flex: 1}}>
+        <Text bold size={16}>
           {item.patient?.first_name || ''} {item.patient?.last_name || ''}
+        </Text>
+
+        <Text
+          style={{
+            marginTop: 6,
+            color: '#334155',
+            fontSize: 14,
+            fontWeight: '500',
+          }}>
+          Nurse: {item.nurse?.name || '-'}
+        </Text>
+
+        <Text
+          style={{
+            marginTop: 6,
+            color: '#334155',
+            fontSize: 14,
+            fontWeight: '500',
+          }}>
+          Temperature: {formatTemp(item.temperature)}
+        </Text>
+
+        <Text
+          style={{
+            marginTop: 6,
+            color: '#334155',
+            fontSize: 14,
+            fontWeight: '500',
+          }}>
+          BP:{' '}
+          {formatBP(
+            item.blood_pressure_systolic,
+            item.blood_pressure_diastolic,
+          )}
+        </Text>
+
+        <Text
+          style={{
+            marginTop: 6,
+            color: '#334155',
+            fontSize: 14,
+            fontWeight: '500',
+          }}>
+          Pulse: {item.pulse_rate || '-'}
+        </Text>
+
+        <Text
+          style={{
+            marginTop: 8,
+            color: '#475569',
+            fontSize: 13,
+            fontWeight: '500',
+          }}>
+          {item.recorded_at?.substring(0, 10)}
         </Text>
       </View>
 
-      <Text gray size={13} style={{marginTop: 4}}>
-        👨‍⚕️ {item.nurse?.name || '-'}
-      </Text>
-      
-      <View style={styles.vitalsRow}>
-        <Text gray size={12}>🌡️ {formatTemp(item.temperature)}</Text>
-        <Text gray size={12}>💓 {item.blood_pressure_systolic ? `${item.blood_pressure_systolic}/${item.blood_pressure_diastolic}` : '-'}</Text>
-        <Text gray size={12}>🫁 {item.pulse_rate || '-'}</Text>
-      </View>
-
-      <Text gray size={12} style={{marginTop: 4}}>
-        📅 {item.recorded_at?.substring(0, 10)} ⏰ {item.recorded_at?.substring(11, 16)}
-      </Text>
-
-      <View style={styles.cardActions}>
+      <View style={styles.statusColumn}>
         <TouchableOpacity
-          style={[styles.actionBtn, {backgroundColor: '#e8f5e9'}]}
+          style={styles.viewButton}
           onPress={() => navigation.navigate('ViewVital', {id: item.id})}>
-          <Text size={12} color="#2e7d32" bold>View</Text>
+          <Text bold color="#2e7d32">
+            VIEW
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.actionBtn, {backgroundColor: '#e3f2fd'}]}
+          style={styles.editButton}
           onPress={() => navigation.navigate('AddVital', {editData: item})}>
-          <Text size={12} color="#1565c0" bold>Edit</Text>
+          <Text bold color="#1565c0">
+            EDIT
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.actionBtn, {backgroundColor: '#fce4ec'}]}
+          style={styles.deleteButton}
           onPress={() => handleDelete(item)}>
-          <Text size={12} color="#c62828" bold>Delete</Text>
+          <Text bold color="#c62828">
+            DELETE
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -119,21 +168,18 @@ const VitalsList = () => {
   return (
     <Block safe>
       <Block scroll={false} paddingHorizontal={sizes.padding} style={{flex: 1}}>
-        <View style={styles.header}>
-          <Text bold size={20}>Patient Monitoring</Text>
-        </View>
-
-        <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={[styles.addBtn, {backgroundColor: '#6c757d'}]}
-            onPress={() => navigation.navigate('TrashVitals')}>
-            <Text bold color="#fff" size={14}>Deleted</Text>
-          </TouchableOpacity>
+        <View style={styles.pageHeader}>
+          <View>
+            <Text style={styles.title}>Patient Monitoring</Text>
+            <Text style={styles.breadcrumb}>Nurse / Patient Monitoring</Text>
+          </View>
 
           <TouchableOpacity
-            style={styles.addBtn}
+            style={styles.primaryButton}
             onPress={() => navigation.navigate('AddVital')}>
-            <Text bold color="#fff" size={14}>+ Record Vital</Text>
+            <Text white style={styles.primaryButtonText}>
+              Record Vital
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -145,19 +191,38 @@ const VitalsList = () => {
             value={searchQuery}
           />
         </View>
-
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#6c757d',
+            paddingVertical: 10,
+            borderRadius: 6,
+            alignItems: 'center',
+            marginBottom: 12,
+          }}
+          onPress={() => navigation.navigate('TrashVitals')}>
+          <Text bold color="#fff">
+            Deleted Records
+          </Text>
+          
+        </TouchableOpacity>
         {loading ? (
           <View style={styles.center}>
             <ActivityIndicator size="large" color="#cb0c9f" />
-            <Text gray style={{marginTop: 10}}>Loading vitals...</Text>
+            <Text gray style={{marginTop: 10}}>
+              Loading vitals...
+            </Text>
           </View>
         ) : filtered.length === 0 ? (
           <View style={styles.center}>
-            <Text gray size={16}>No vitals records found</Text>
+            <Text gray size={16}>
+              No vitals records found
+            </Text>
             <TouchableOpacity
               style={[styles.addBtn, {marginTop: 16}]}
               onPress={() => navigation.navigate('AddVital')}>
-              <Text bold color="#fff" size={14}>+ Record First Vital</Text>
+              <Text bold color="#fff" size={14}>
+                + Record First Vital
+              </Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -191,20 +256,19 @@ const styles = StyleSheet.create({
   addBtn: {
     backgroundColor: '#cb0c9f',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 6,
     borderRadius: 8,
   },
   searchContainer: {marginBottom: 8},
   card: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
+    borderWidth: 1,
+    borderColor: '#e1e6ee',
+    borderRadius: 8,
+    padding: 14,
     marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowOffset: {width: 0, height: 2},
-    shadowRadius: 6,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -232,7 +296,78 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 60,
   },
+  pageHeader: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 12,
+    marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    elevation: 2,
+  },
+
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#0f2f4a',
+  },
+
+  breadcrumb: {
+    marginTop: 4,
+    color: '#8a98b3',
+    fontWeight: '600',
+  },
+
+  primaryButton: {
+    backgroundColor: '#cd1b83',
+    borderRadius: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+
+  primaryButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  statusColumn: {
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+
+  viewButton: {
+    backgroundColor: '#e8f5e9',
+    borderRadius: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    alignSelf: 'flex-end',
+    minWidth: 90,
+    alignItems: 'center',
+  },
+
+  editButton: {
+    backgroundColor: '#e3f2fd',
+    borderRadius: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    marginTop: 8,
+    alignSelf: 'flex-end',
+    minWidth: 90,
+    alignItems: 'center',
+  },
+
+  deleteButton: {
+    backgroundColor: '#fce4ec',
+    borderRadius: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    marginTop: 8,
+    alignSelf: 'flex-end',
+    minWidth: 90,
+    alignItems: 'center',
+  },
 });
 
 export default VitalsList;
-

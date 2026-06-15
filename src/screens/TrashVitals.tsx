@@ -89,36 +89,77 @@ const TrashVitals = () => {
   };
 
   const renderItem = ({item}: {item: any}) => (
-    <View style={styles.card}>
-      <Text bold size={14}>
-        {item.patient?.first_name || ''} {item.patient?.last_name || ''}
-      </Text>
-      <Text gray size={12} style={{marginTop: 4}}>
-        🌡️ {item.temperature ? `${item.temperature}°C` : '-'}
-      </Text>
-      <Text gray size={12} style={{marginTop: 2}}>
-        👨‍⚕️ {item.nurse?.name || '-'}
-      </Text>
-      <Text gray size={12} style={{marginTop: 2}}>
-        📅 {item.recorded_at?.substring(0, 10)}  ⏰ {item.recorded_at?.substring(11, 16)}
-      </Text>
+  <View style={styles.card}>
+    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+      {/* LEFT SIDE */}
+      <View style={{flex: 1}}>
+        <Text bold size={16} style={{color: '#2d3748'}}>
+          {item.patient?.first_name || ''} {item.patient?.last_name || ''}
+        </Text>
 
-      <View style={styles.cardActions}>
+        <Text
+          size={14}
+          style={{marginTop: 10, color: '#4a5568'}}>
+          Nurse: {item.nurse?.name || '-'}
+        </Text>
+
+        <Text
+          size={14}
+          style={{marginTop: 8, color: '#4a5568'}}>
+          Temperature: {item.temperature || '-'}°C
+        </Text>
+
+        <Text
+          size={14}
+          style={{marginTop: 8, color: '#4a5568'}}>
+          BP: {item.blood_pressure_systolic || '-'}
+          /
+          {item.blood_pressure_diastolic || '-'}
+        </Text>
+
+        <Text
+          size={14}
+          style={{marginTop: 8, color: '#4a5568'}}>
+          Pulse: {item.pulse_rate || '-'}
+        </Text>
+
+        <Text
+          size={14}
+          style={{marginTop: 12, color: '#4a5568'}}>
+          {item.recorded_at?.substring(0, 10)}
+        </Text>
+      </View>
+
+      {/* RIGHT SIDE */}
+      <View style={{alignItems: 'center'}}>
         <TouchableOpacity
-          style={[styles.actionBtn, {backgroundColor: '#e8f5e9'}]}
+          style={[
+            styles.actionBtn,
+            {backgroundColor: '#dff0df'},
+          ]}
           onPress={() => handleRestore(item)}>
-          <Text size={12} color="#2e7d32" bold>Restore</Text>
+          <Text bold color="#2e7d32">
+            RESTORE
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.actionBtn, {backgroundColor: '#fce4ec'}]}
+          style={[
+            styles.actionBtn,
+            {
+              backgroundColor: '#fce4ec',
+              marginTop: 12,
+            },
+          ]}
           onPress={() => handleForceDelete(item)}>
-          <Text size={12} color="#c62828" bold>Delete Forever</Text>
+          <Text bold color="#c62828">
+            DELETE
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
-  );
-
+  </View>
+);
   return (
     <Block safe>
       <Block scroll={false} paddingHorizontal={sizes.padding} style={{flex: 1}}>
@@ -161,26 +202,23 @@ const styles = StyleSheet.create({
   header: {marginTop: 16, marginBottom: 12},
   searchContainer: {marginBottom: 12},
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowOffset: {width: 0, height: 2},
-    shadowRadius: 6,
-  },
-  cardActions: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 10,
-  },
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 18,
+  marginBottom: 16,
+  elevation: 2,
+  shadowColor: '#000',
+  shadowOpacity: 0.06,
+  shadowOffset: {width: 0, height: 2},
+  shadowRadius: 6,
+},
   actionBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 5,
-  },
+  width: 100,
+  height: 42,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 8,
+},
   center: {
     flex: 1,
     justifyContent: 'center',
